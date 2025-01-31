@@ -1,0 +1,587 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		63406DC72D4CAC7A006FA124 /* AsareApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DC62D4CAC7A006FA124 /* AsareApp.swift */; };
+		63406DC92D4CAC7A006FA124 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DC82D4CAC7A006FA124 /* ContentView.swift */; };
+		63406DCB2D4CAC7C006FA124 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63406DCA2D4CAC7C006FA124 /* Assets.xcassets */; };
+		63406DCE2D4CAC7C006FA124 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63406DCD2D4CAC7C006FA124 /* Preview Assets.xcassets */; };
+		63406DD82D4CAC7D006FA124 /* AsareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DD72D4CAC7D006FA124 /* AsareTests.swift */; };
+		63406DE22D4CAC7D006FA124 /* AsareUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DE12D4CAC7D006FA124 /* AsareUITests.swift */; };
+		63406DE42D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DE32D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		63406DD42D4CAC7D006FA124 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 63406DBB2D4CAC7A006FA124 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 63406DC22D4CAC7A006FA124;
+			remoteInfo = Asare;
+		};
+		63406DDE2D4CAC7D006FA124 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 63406DBB2D4CAC7A006FA124 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 63406DC22D4CAC7A006FA124;
+			remoteInfo = Asare;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		63406DC32D4CAC7A006FA124 /* Asare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asare.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		63406DC62D4CAC7A006FA124 /* AsareApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsareApp.swift; sourceTree = "<group>"; };
+		63406DC82D4CAC7A006FA124 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		63406DCA2D4CAC7C006FA124 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		63406DCD2D4CAC7C006FA124 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		63406DD32D4CAC7D006FA124 /* AsareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AsareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		63406DD72D4CAC7D006FA124 /* AsareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsareTests.swift; sourceTree = "<group>"; };
+		63406DDD2D4CAC7D006FA124 /* AsareUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AsareUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		63406DE12D4CAC7D006FA124 /* AsareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsareUITests.swift; sourceTree = "<group>"; };
+		63406DE32D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsareUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		63406DC02D4CAC7A006FA124 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		63406DD02D4CAC7D006FA124 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		63406DDA2D4CAC7D006FA124 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		63406DBA2D4CAC7A006FA124 = {
+			isa = PBXGroup;
+			children = (
+				63406DC52D4CAC7A006FA124 /* Asare */,
+				63406DD62D4CAC7D006FA124 /* AsareTests */,
+				63406DE02D4CAC7D006FA124 /* AsareUITests */,
+				63406DC42D4CAC7A006FA124 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		63406DC42D4CAC7A006FA124 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				63406DC32D4CAC7A006FA124 /* Asare.app */,
+				63406DD32D4CAC7D006FA124 /* AsareTests.xctest */,
+				63406DDD2D4CAC7D006FA124 /* AsareUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		63406DC52D4CAC7A006FA124 /* Asare */ = {
+			isa = PBXGroup;
+			children = (
+				63406DC62D4CAC7A006FA124 /* AsareApp.swift */,
+				63406DC82D4CAC7A006FA124 /* ContentView.swift */,
+				63406DCA2D4CAC7C006FA124 /* Assets.xcassets */,
+				63406DCC2D4CAC7C006FA124 /* Preview Content */,
+			);
+			path = Asare;
+			sourceTree = "<group>";
+		};
+		63406DCC2D4CAC7C006FA124 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				63406DCD2D4CAC7C006FA124 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		63406DD62D4CAC7D006FA124 /* AsareTests */ = {
+			isa = PBXGroup;
+			children = (
+				63406DD72D4CAC7D006FA124 /* AsareTests.swift */,
+			);
+			path = AsareTests;
+			sourceTree = "<group>";
+		};
+		63406DE02D4CAC7D006FA124 /* AsareUITests */ = {
+			isa = PBXGroup;
+			children = (
+				63406DE12D4CAC7D006FA124 /* AsareUITests.swift */,
+				63406DE32D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift */,
+			);
+			path = AsareUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		63406DC22D4CAC7A006FA124 /* Asare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 63406DE72D4CAC7D006FA124 /* Build configuration list for PBXNativeTarget "Asare" */;
+			buildPhases = (
+				63406DBF2D4CAC7A006FA124 /* Sources */,
+				63406DC02D4CAC7A006FA124 /* Frameworks */,
+				63406DC12D4CAC7A006FA124 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Asare;
+			productName = Asare;
+			productReference = 63406DC32D4CAC7A006FA124 /* Asare.app */;
+			productType = "com.apple.product-type.application";
+		};
+		63406DD22D4CAC7D006FA124 /* AsareTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 63406DEA2D4CAC7D006FA124 /* Build configuration list for PBXNativeTarget "AsareTests" */;
+			buildPhases = (
+				63406DCF2D4CAC7D006FA124 /* Sources */,
+				63406DD02D4CAC7D006FA124 /* Frameworks */,
+				63406DD12D4CAC7D006FA124 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				63406DD52D4CAC7D006FA124 /* PBXTargetDependency */,
+			);
+			name = AsareTests;
+			productName = AsareTests;
+			productReference = 63406DD32D4CAC7D006FA124 /* AsareTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		63406DDC2D4CAC7D006FA124 /* AsareUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 63406DED2D4CAC7D006FA124 /* Build configuration list for PBXNativeTarget "AsareUITests" */;
+			buildPhases = (
+				63406DD92D4CAC7D006FA124 /* Sources */,
+				63406DDA2D4CAC7D006FA124 /* Frameworks */,
+				63406DDB2D4CAC7D006FA124 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				63406DDF2D4CAC7D006FA124 /* PBXTargetDependency */,
+			);
+			name = AsareUITests;
+			productName = AsareUITests;
+			productReference = 63406DDD2D4CAC7D006FA124 /* AsareUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		63406DBB2D4CAC7A006FA124 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					63406DC22D4CAC7A006FA124 = {
+						CreatedOnToolsVersion = 15.2;
+					};
+					63406DD22D4CAC7D006FA124 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 63406DC22D4CAC7A006FA124;
+					};
+					63406DDC2D4CAC7D006FA124 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 63406DC22D4CAC7A006FA124;
+					};
+				};
+			};
+			buildConfigurationList = 63406DBE2D4CAC7A006FA124 /* Build configuration list for PBXProject "Asare" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 63406DBA2D4CAC7A006FA124;
+			productRefGroup = 63406DC42D4CAC7A006FA124 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				63406DC22D4CAC7A006FA124 /* Asare */,
+				63406DD22D4CAC7D006FA124 /* AsareTests */,
+				63406DDC2D4CAC7D006FA124 /* AsareUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		63406DC12D4CAC7A006FA124 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63406DCE2D4CAC7C006FA124 /* Preview Assets.xcassets in Resources */,
+				63406DCB2D4CAC7C006FA124 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		63406DD12D4CAC7D006FA124 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		63406DDB2D4CAC7D006FA124 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		63406DBF2D4CAC7A006FA124 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63406DC92D4CAC7A006FA124 /* ContentView.swift in Sources */,
+				63406DC72D4CAC7A006FA124 /* AsareApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		63406DCF2D4CAC7D006FA124 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63406DD82D4CAC7D006FA124 /* AsareTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		63406DD92D4CAC7D006FA124 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63406DE22D4CAC7D006FA124 /* AsareUITests.swift in Sources */,
+				63406DE42D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		63406DD52D4CAC7D006FA124 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 63406DC22D4CAC7A006FA124 /* Asare */;
+			targetProxy = 63406DD42D4CAC7D006FA124 /* PBXContainerItemProxy */;
+		};
+		63406DDF2D4CAC7D006FA124 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 63406DC22D4CAC7A006FA124 /* Asare */;
+			targetProxy = 63406DDE2D4CAC7D006FA124 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		63406DE52D4CAC7D006FA124 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		63406DE62D4CAC7D006FA124 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		63406DE82D4CAC7D006FA124 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Asare/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Dissertation.Asare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		63406DE92D4CAC7D006FA124 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Asare/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Dissertation.Asare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		63406DEB2D4CAC7D006FA124 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Dissertation.AsareTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Asare.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Asare";
+			};
+			name = Debug;
+		};
+		63406DEC2D4CAC7D006FA124 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Dissertation.AsareTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Asare.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Asare";
+			};
+			name = Release;
+		};
+		63406DEE2D4CAC7D006FA124 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Dissertation.AsareUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Asare;
+			};
+			name = Debug;
+		};
+		63406DEF2D4CAC7D006FA124 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Dissertation.AsareUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Asare;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		63406DBE2D4CAC7A006FA124 /* Build configuration list for PBXProject "Asare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63406DE52D4CAC7D006FA124 /* Debug */,
+				63406DE62D4CAC7D006FA124 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		63406DE72D4CAC7D006FA124 /* Build configuration list for PBXNativeTarget "Asare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63406DE82D4CAC7D006FA124 /* Debug */,
+				63406DE92D4CAC7D006FA124 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		63406DEA2D4CAC7D006FA124 /* Build configuration list for PBXNativeTarget "AsareTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63406DEB2D4CAC7D006FA124 /* Debug */,
+				63406DEC2D4CAC7D006FA124 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		63406DED2D4CAC7D006FA124 /* Build configuration list for PBXNativeTarget "AsareUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63406DEE2D4CAC7D006FA124 /* Debug */,
+				63406DEF2D4CAC7D006FA124 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 63406DBB2D4CAC7A006FA124 /* Project object */;
+}
