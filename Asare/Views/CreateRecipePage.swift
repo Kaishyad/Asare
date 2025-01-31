@@ -9,13 +9,16 @@ struct CreateRecipePage: View {
             Text("➕ Create New Recipe")
                 .font(settings.font)
                 .padding()
+                .accessibilityLabel("Create a new recipe")
 
             TextField("Enter Recipe Name", text: $recipeName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .font(settings.font)
                 .padding()
+                .accessibilityLabel("Enter the name of your recipe")
 
             Button(action: {
+                settings.triggerHaptic()
                 print("Recipe Saved: \(recipeName)")
             }) {
                 Text("Save Recipe")

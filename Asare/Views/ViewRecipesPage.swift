@@ -8,6 +8,7 @@ struct ViewRecipesPage: View {
             Text("📖 All Recipes")
                 .font(settings.font)
                 .padding()
+                .accessibilityLabel("View all saved recipes")
             Spacer()
         }
         .navigationTitle("Recipes")

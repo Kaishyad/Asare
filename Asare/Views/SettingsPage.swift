@@ -8,12 +8,18 @@ struct SettingsPage: View {
             Section(header: Text("Appearance").font(settings.font)) {
                 Toggle("Dark Mode", isOn: $settings.isDarkMode)
                     .font(settings.font)
+                    .accessibilityLabel("Toggle Dark Mode")
             }
 
-            Section(header: Text("Font Size").font(settings.font)) {
+            Section(header: Text("Font & Accessibility").font(settings.font)) {
                 Slider(value: $settings.fontSize, in: 12...30, step: 1)
+                    .accessibilityValue("\(Int(settings.fontSize)) points")
                 Text("Preview: \(Int(settings.fontSize)) pt")
                     .font(settings.font)
+
+                Toggle("Use Dyslexia-Friendly Font", isOn: $settings.useDyslexiaFont)
+                    .font(settings.font)
+                    .accessibilityLabel("Enable Dyslexia-Friendly Font")
             }
 
             Section(header: Text("Preferences").font(settings.font)) {
@@ -23,12 +29,7 @@ struct SettingsPage: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .font(settings.font)
-            }
-
-            Section {
-                Text("All settings are saved automatically ✅")
-                    .font(.footnote)
-                    .foregroundColor(.gray)
+                .accessibilityLabel("Measurement Unit Selection")
             }
         }
         .navigationTitle("Settings")

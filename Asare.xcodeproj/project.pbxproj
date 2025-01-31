@@ -18,6 +18,10 @@
 		63406DF32D4CADAB006FA124 /* CreateRecipePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DF22D4CADAB006FA124 /* CreateRecipePage.swift */; };
 		63406DF52D4CADC4006FA124 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DF42D4CADC4006FA124 /* SettingsPage.swift */; };
 		63406DF72D4CAEC8006FA124 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DF62D4CAEC8006FA124 /* AppSettings.swift */; };
+		63406DFB2D4CE023006FA124 /* HomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DFA2D4CE023006FA124 /* HomePage.swift */; };
+		63406DFD2D4CE0BE006FA124 /* LoginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DFC2D4CE0BE006FA124 /* LoginPage.swift */; };
+		63406DFF2D4CE0CC006FA124 /* ProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DFE2D4CE0CC006FA124 /* ProfilePage.swift */; };
+		63406E012D4CE47D006FA124 /* SignUpPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406E002D4CE47D006FA124 /* SignUpPage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +56,10 @@
 		63406DF22D4CADAB006FA124 /* CreateRecipePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRecipePage.swift; sourceTree = "<group>"; };
 		63406DF42D4CADC4006FA124 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
 		63406DF62D4CAEC8006FA124 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		63406DFA2D4CE023006FA124 /* HomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePage.swift; sourceTree = "<group>"; };
+		63406DFC2D4CE0BE006FA124 /* LoginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
+		63406DFE2D4CE0CC006FA124 /* ProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePage.swift; sourceTree = "<group>"; };
+		63406E002D4CE47D006FA124 /* SignUpPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpPage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,14 +110,11 @@
 		63406DC52D4CAC7A006FA124 /* Asare */ = {
 			isa = PBXGroup;
 			children = (
+				63406E0D2D4CE988006FA124 /* Models */,
 				63406DC62D4CAC7A006FA124 /* AsareApp.swift */,
-				63406DC82D4CAC7A006FA124 /* ContentView.swift */,
 				63406DCA2D4CAC7C006FA124 /* Assets.xcassets */,
+				63406E0F2D4CEA7F006FA124 /* Views */,
 				63406DCC2D4CAC7C006FA124 /* Preview Content */,
-				63406DF02D4CACE1006FA124 /* ViewRecipesPage.swift */,
-				63406DF22D4CADAB006FA124 /* CreateRecipePage.swift */,
-				63406DF42D4CADC4006FA124 /* SettingsPage.swift */,
-				63406DF62D4CAEC8006FA124 /* AppSettings.swift */,
 			);
 			path = Asare;
 			sourceTree = "<group>";
@@ -137,6 +142,29 @@
 				63406DE32D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift */,
 			);
 			path = AsareUITests;
+			sourceTree = "<group>";
+		};
+		63406E0D2D4CE988006FA124 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		63406E0F2D4CEA7F006FA124 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				63406DF02D4CACE1006FA124 /* ViewRecipesPage.swift */,
+				63406DF22D4CADAB006FA124 /* CreateRecipePage.swift */,
+				63406DF42D4CADC4006FA124 /* SettingsPage.swift */,
+				63406DF62D4CAEC8006FA124 /* AppSettings.swift */,
+				63406DFA2D4CE023006FA124 /* HomePage.swift */,
+				63406DFC2D4CE0BE006FA124 /* LoginPage.swift */,
+				63406DFE2D4CE0CC006FA124 /* ProfilePage.swift */,
+				63406E002D4CE47D006FA124 /* SignUpPage.swift */,
+				63406DC82D4CAC7A006FA124 /* ContentView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -269,11 +297,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63406DFF2D4CE0CC006FA124 /* ProfilePage.swift in Sources */,
+				63406DFD2D4CE0BE006FA124 /* LoginPage.swift in Sources */,
 				63406DC92D4CAC7A006FA124 /* ContentView.swift in Sources */,
 				63406DF12D4CACE1006FA124 /* ViewRecipesPage.swift in Sources */,
 				63406DF72D4CAEC8006FA124 /* AppSettings.swift in Sources */,
 				63406DF32D4CADAB006FA124 /* CreateRecipePage.swift in Sources */,
+				63406E012D4CE47D006FA124 /* SignUpPage.swift in Sources */,
 				63406DC72D4CAC7A006FA124 /* AsareApp.swift in Sources */,
+				63406DFB2D4CE023006FA124 /* HomePage.swift in Sources */,
 				63406DF52D4CADC4006FA124 /* SettingsPage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
