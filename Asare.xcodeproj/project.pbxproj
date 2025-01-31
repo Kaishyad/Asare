@@ -14,6 +14,10 @@
 		63406DD82D4CAC7D006FA124 /* AsareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DD72D4CAC7D006FA124 /* AsareTests.swift */; };
 		63406DE22D4CAC7D006FA124 /* AsareUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DE12D4CAC7D006FA124 /* AsareUITests.swift */; };
 		63406DE42D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DE32D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift */; };
+		63406DF12D4CACE1006FA124 /* ViewRecipesPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DF02D4CACE1006FA124 /* ViewRecipesPage.swift */; };
+		63406DF32D4CADAB006FA124 /* CreateRecipePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DF22D4CADAB006FA124 /* CreateRecipePage.swift */; };
+		63406DF52D4CADC4006FA124 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DF42D4CADC4006FA124 /* SettingsPage.swift */; };
+		63406DF72D4CAEC8006FA124 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DF62D4CAEC8006FA124 /* AppSettings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +48,10 @@
 		63406DDD2D4CAC7D006FA124 /* AsareUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AsareUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		63406DE12D4CAC7D006FA124 /* AsareUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsareUITests.swift; sourceTree = "<group>"; };
 		63406DE32D4CAC7D006FA124 /* AsareUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsareUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		63406DF02D4CACE1006FA124 /* ViewRecipesPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRecipesPage.swift; sourceTree = "<group>"; };
+		63406DF22D4CADAB006FA124 /* CreateRecipePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRecipePage.swift; sourceTree = "<group>"; };
+		63406DF42D4CADC4006FA124 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
+		63406DF62D4CAEC8006FA124 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +106,10 @@
 				63406DC82D4CAC7A006FA124 /* ContentView.swift */,
 				63406DCA2D4CAC7C006FA124 /* Assets.xcassets */,
 				63406DCC2D4CAC7C006FA124 /* Preview Content */,
+				63406DF02D4CACE1006FA124 /* ViewRecipesPage.swift */,
+				63406DF22D4CADAB006FA124 /* CreateRecipePage.swift */,
+				63406DF42D4CADC4006FA124 /* SettingsPage.swift */,
+				63406DF62D4CAEC8006FA124 /* AppSettings.swift */,
 			);
 			path = Asare;
 			sourceTree = "<group>";
@@ -258,7 +270,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				63406DC92D4CAC7A006FA124 /* ContentView.swift in Sources */,
+				63406DF12D4CACE1006FA124 /* ViewRecipesPage.swift in Sources */,
+				63406DF72D4CAEC8006FA124 /* AppSettings.swift in Sources */,
+				63406DF32D4CADAB006FA124 /* CreateRecipePage.swift in Sources */,
 				63406DC72D4CAC7A006FA124 /* AsareApp.swift in Sources */,
+				63406DF52D4CADC4006FA124 /* SettingsPage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
