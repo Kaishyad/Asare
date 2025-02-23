@@ -2,8 +2,20 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var settings = AppSettings() // Create AppSettings as a StateObject
-    @State private var isAuthenticated: Bool = UserDefaults.standard.bool(forKey: "isAuthenticated")
+    @State private var isAuthenticated: Bool = DatabaseManager.shared.isUserAuthenticated() // Get auth status from SQLite
     @State private var showBanner: Bool = false
+
+    private let settingsManager = UserSettingsManager.shared
+
+    func loadUserSettings() {
+        if let user = DatabaseManager.shared.getCurrentUser(),
+           let userSettings = settingsManager.getUserSettings(username: user.username) {
+            settings.isDarkMode = userSettings.darkMode
+            settings.fontSize = userSettings.fontSize
+            settings.useDyslexiaFont = userSettings.useDyslexiaFont
+            settings.measurementUnit = userSettings.measurementUnit
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -32,6 +44,8 @@ struct ContentView: View {
                                 }
                             )
                             .onAppear {
+                                loadUserSettings() // Load settings when HomePage appears
+
                                 // Hide the banner after 3 seconds
                                 if showBanner {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -86,8 +100,11 @@ struct ContentView: View {
                         Image(systemName: "person.fill")
                         Text("Profile")
                     }
-                }
+                }.accentColor(.pink)
                 .preferredColorScheme(settings.isDarkMode ? .dark : .light)
+                .onAppear {
+                    loadUserSettings() // Load settings when ContentView appears
+                }
             } else {
                 // Show LoginPage if not authenticated
                 LoginPage(isAuthenticated: $isAuthenticated)

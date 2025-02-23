@@ -2,14 +2,14 @@ import SwiftUI
 
 struct SignUpPage: View {
     @Binding var isAuthenticated: Bool
-    @EnvironmentObject var settings: AppSettings  // Access settings via @EnvironmentObject
-    
+    @EnvironmentObject var settings: AppSettings
+
     @State private var username: String = ""
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
     @State private var errorMessage: String? = nil
-    @State private var showSuccessBanner: Bool = false  // Banner for success
+    @State private var showSuccessBanner: Bool = false
 
     var body: some View {
         VStack {
@@ -67,20 +67,26 @@ struct SignUpPage: View {
             return
         }
         
-        // Store user information in UserDefaults (for demo purposes, in production use a secure backend)
-        UserDefaults.standard.set(username, forKey: "username")
-        UserDefaults.standard.set(email, forKey: "email")
-        UserDefaults.standard.set(password, forKey: "password") // NEVER store passwords in plaintext in production
-        UserDefaults.standard.set(true, forKey: "isAuthenticated") // Mark user as authenticated
-        
-        // Set authentication status and show success banner
-        isAuthenticated = true
-        errorMessage = nil
-        showSuccessBanner = true
-        
-        // After 3 seconds, hide the banner
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            showSuccessBanner = false
+        // Check if the username already exists
+        if DatabaseManager.shared.checkUserExists(username: username) {
+            errorMessage = "Username already taken"
+            return
+        }
+
+        // Insert into SQLite Database
+        let success = DatabaseManager.shared.insertUser(username: username, email: email, password: password)
+
+        if success {
+            isAuthenticated = true
+            errorMessage = nil
+            showSuccessBanner = true
+
+            // Hide success banner after 3 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                showSuccessBanner = false
+            }
+        } else {
+            errorMessage = "Failed to sign up. Please try again."
         }
     }
 }

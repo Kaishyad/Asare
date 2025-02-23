@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6328A1352D68D99F004DFA46 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 6328A1342D68D99F004DFA46 /* SQLite */; };
+		6328A1372D68DA16004DFA46 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328A1362D68DA16004DFA46 /* DatabaseManager.swift */; };
+		6328A13B2D68E041004DFA46 /* UsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328A13A2D68E041004DFA46 /* UsersListView.swift */; };
+		6328A13D2D68E5CB004DFA46 /* UserSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328A13C2D68E5CB004DFA46 /* UserSettingsManager.swift */; };
+		6328A13F2D69E476004DFA46 /* RecipeDatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328A13E2D69E476004DFA46 /* RecipeDatabaseManager.swift */; };
 		63406DC72D4CAC7A006FA124 /* AsareApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DC62D4CAC7A006FA124 /* AsareApp.swift */; };
 		63406DC92D4CAC7A006FA124 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DC82D4CAC7A006FA124 /* ContentView.swift */; };
 		63406DCB2D4CAC7C006FA124 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63406DCA2D4CAC7C006FA124 /* Assets.xcassets */; };
@@ -42,6 +47,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6328A1362D68DA16004DFA46 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		6328A13A2D68E041004DFA46 /* UsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersListView.swift; sourceTree = "<group>"; };
+		6328A13C2D68E5CB004DFA46 /* UserSettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsManager.swift; sourceTree = "<group>"; };
+		6328A13E2D69E476004DFA46 /* RecipeDatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDatabaseManager.swift; sourceTree = "<group>"; };
 		63406DC32D4CAC7A006FA124 /* Asare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		63406DC62D4CAC7A006FA124 /* AsareApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsareApp.swift; sourceTree = "<group>"; };
 		63406DC82D4CAC7A006FA124 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -67,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6328A1352D68D99F004DFA46 /* SQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +97,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6328A1402D69E52D004DFA46 /* Database Managers */ = {
+			isa = PBXGroup;
+			children = (
+				6328A13C2D68E5CB004DFA46 /* UserSettingsManager.swift */,
+				6328A1362D68DA16004DFA46 /* DatabaseManager.swift */,
+				6328A13E2D69E476004DFA46 /* RecipeDatabaseManager.swift */,
+			);
+			path = "Database Managers";
+			sourceTree = "<group>";
+		};
 		63406DBA2D4CAC7A006FA124 = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +135,8 @@
 				63406DCA2D4CAC7C006FA124 /* Assets.xcassets */,
 				63406E0F2D4CEA7F006FA124 /* Views */,
 				63406DCC2D4CAC7C006FA124 /* Preview Content */,
+				6328A13A2D68E041004DFA46 /* UsersListView.swift */,
+				6328A1402D69E52D004DFA46 /* Database Managers */,
 			);
 			path = Asare;
 			sourceTree = "<group>";
@@ -183,6 +205,9 @@
 			dependencies = (
 			);
 			name = Asare;
+			packageProductDependencies = (
+				6328A1342D68D99F004DFA46 /* SQLite */,
+			);
 			productName = Asare;
 			productReference = 63406DC32D4CAC7A006FA124 /* Asare.app */;
 			productType = "com.apple.product-type.application";
@@ -255,6 +280,9 @@
 				Base,
 			);
 			mainGroup = 63406DBA2D4CAC7A006FA124;
+			packageReferences = (
+				6328A1332D68D99F004DFA46 /* XCRemoteSwiftPackageReference "SQLite" */,
+			);
 			productRefGroup = 63406DC42D4CAC7A006FA124 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -303,8 +331,12 @@
 				63406DF12D4CACE1006FA124 /* ViewRecipesPage.swift in Sources */,
 				63406DF72D4CAEC8006FA124 /* AppSettings.swift in Sources */,
 				63406DF32D4CADAB006FA124 /* CreateRecipePage.swift in Sources */,
+				6328A13F2D69E476004DFA46 /* RecipeDatabaseManager.swift in Sources */,
+				6328A13D2D68E5CB004DFA46 /* UserSettingsManager.swift in Sources */,
 				63406E012D4CE47D006FA124 /* SignUpPage.swift in Sources */,
+				6328A13B2D68E041004DFA46 /* UsersListView.swift in Sources */,
 				63406DC72D4CAC7A006FA124 /* AsareApp.swift in Sources */,
+				6328A1372D68DA16004DFA46 /* DatabaseManager.swift in Sources */,
 				63406DFB2D4CE023006FA124 /* HomePage.swift in Sources */,
 				63406DF52D4CADC4006FA124 /* SettingsPage.swift in Sources */,
 			);
@@ -630,6 +662,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6328A1332D68D99F004DFA46 /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6328A1342D68D99F004DFA46 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6328A1332D68D99F004DFA46 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 63406DBB2D4CAC7A006FA124 /* Project object */;
 }
