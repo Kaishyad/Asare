@@ -19,6 +19,8 @@ class RecipeDatabaseManager {
     private let recipeId = Expression<Int64>("recipe_id")
     private let filterIdRef = Expression<Int64>("filter_id")
 
+    private let defaultFilters = ["Vegetarian", "Quick", "Spicy", "High-Protein", "Gluten-Free", "Vegan", "Dairy-Free", "Keto"]
+
     private init() {
         do {
             let path = FileManager.default
@@ -30,6 +32,7 @@ class RecipeDatabaseManager {
 
             db = try Connection(path)
             createTables()
+            insertDefaultFilters() // Adds default filters
         } catch {
             print("Error initializing database: \(error)")
         }
@@ -37,7 +40,6 @@ class RecipeDatabaseManager {
 
     private func createTables() {
         do {
-            // Create recipes table if not exists
             try db?.run(recipes.create(ifNotExists: true) { t in
                 t.column(id, primaryKey: true)
                 t.column(username)
@@ -45,13 +47,11 @@ class RecipeDatabaseManager {
                 t.column(description)
             })
 
-            // Create filters table if not exists
             try db?.run(filters.create(ifNotExists: true) { t in
                 t.column(filterId, primaryKey: true)
-                t.column(filterName)
+                t.column(filterName, unique: true)
             })
 
-            // Create many-to-many table between recipes and filters
             try db?.run(recipeFilters.create(ifNotExists: true) { t in
                 t.column(recipeId)
                 t.column(filterIdRef)
@@ -65,9 +65,26 @@ class RecipeDatabaseManager {
         }
     }
 
+    private func insertDefaultFilters() {
+        do {
+            for filter in defaultFilters {
+                let existingFilter = filters.filter(filterName == filter)
+                if try db?.pluck(existingFilter) == nil {
+                    try db?.run(filters.insert(filterName <- filter))
+                }
+            }
+            print("Default filters added!")
+        } catch {
+            print("Error inserting default filters: \(error)")
+        }
+    }
+
     func addFilter(name: String) -> Bool {
         do {
-            try db?.run(filters.insert(filterName <- name))
+            let existingFilter = filters.filter(filterName == name)
+            if try db?.pluck(existingFilter) == nil {
+                try db?.run(filters.insert(filterName <- name))
+            }
             return true
         } catch {
             print("Error adding filter: \(error)")
@@ -75,15 +92,23 @@ class RecipeDatabaseManager {
         }
     }
 
+    func getAllFilters() -> [String] {
+        do {
+            return try db?.prepare(filters).map { $0[filterName] } ?? []
+        } catch {
+            print("Error fetching filters: \(error)")
+            return []
+        }
+    }
+
     func addRecipe(username: String, name: String, description: String, selectedFilters: [String]) -> Bool {
         do {
             let recipeId = try db?.run(recipes.insert(self.username <- username, self.name <- name, self.description <- description))
 
-            //Insert the filters for the recipe
-            for filterName in selectedFilters {
-                let filter = filters.filter(self.filterName == filterName)
-                if let filterRow = try db?.pluck(filter) {
-                    let filterIdValue = filterRow[self.filterId]
+            for filter in selectedFilters {
+                let filterQuery = filters.filter(filterName == filter)
+                if let filterRow = try db?.pluck(filterQuery) {
+                    let filterIdValue = filterRow[filterId]
                     try db?.run(recipeFilters.insert(self.recipeId <- recipeId!, self.filterIdRef <- filterIdValue))
                 }
             }
@@ -95,7 +120,36 @@ class RecipeDatabaseManager {
         }
     }
 
-    //Fetch recipes for a specific user along with filters
+    func deleteRecipe(name: String) -> Bool {
+        do {
+            let recipeToDelete = recipes.filter(self.name == name)
+            try db?.run(recipeToDelete.delete())
+            return true
+        } catch {
+            print("Error deleting recipe: \(error)")
+            return false
+        }
+    }
+
+    func deleteFilter(name: String) -> Bool {
+        do {
+            let filterToDelete = filters.filter(filterName == name)
+
+            if let filterRow = try db?.pluck(filterToDelete) {
+                let filterIdValue = filterRow[filterId]
+                let filterAssociations = recipeFilters.filter(filterIdRef == filterIdValue)
+                try db?.run(filterAssociations.delete())
+            }
+
+            try db?.run(filterToDelete.delete())
+            
+            return true
+        } catch {
+            print("Error deleting filter: \(error)")
+            return false
+        }
+    }
+
     func fetchRecipesForUser(username: String, completion: @escaping ([(name: String, description: String, filters: [String])]) -> Void) {
         do {
             let query = recipes.filter(self.username == username)
@@ -106,7 +160,6 @@ class RecipeDatabaseManager {
                 let recipeName = recipe[self.name]
                 let recipeDescription = recipe[self.description]
 
-                // Fetch filters associated with this recipe
                 let filtersQuery = recipeFilters.filter(self.recipeId == recipe[self.id])
                     .join(filters, on: filters[self.filterId] == recipeFilters[self.filterIdRef])
 
@@ -121,7 +174,7 @@ class RecipeDatabaseManager {
             completion(fetchedRecipes)
         } catch {
             print("Error fetching recipes with filters: \(error)")
-            completion([]) // Return empty array on error
+            completion([])
         }
     }
 }

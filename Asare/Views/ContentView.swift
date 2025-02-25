@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var settings = AppSettings() // Create AppSettings as a StateObject
-    @State private var isAuthenticated: Bool = DatabaseManager.shared.isUserAuthenticated() // Get auth status from SQLite
+    @StateObject var settings = AppSettings() //create AppSettings as a StateObject
+    @State private var isAuthenticated: Bool = DatabaseManager.shared.isUserAuthenticated() //Get auth status from SQLite
     @State private var showBanner: Bool = false
 
     private let settingsManager = UserSettingsManager.shared
@@ -20,14 +20,11 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             if isAuthenticated {
-                // Show the TabView if authenticated
                 TabView {
-                    // Home Page Tab
                     NavigationStack {
                         HomePage()
                             .environmentObject(settings)
                             .overlay(
-                                // Show banner if successful sign-up
                                 Group {
                                     if showBanner {
                                         HStack {
@@ -44,9 +41,8 @@ struct ContentView: View {
                                 }
                             )
                             .onAppear {
-                                loadUserSettings() // Load settings when HomePage appears
+                                loadUserSettings()
 
-                                // Hide the banner after 3 seconds
                                 if showBanner {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                         withAnimation {
@@ -61,9 +57,8 @@ struct ContentView: View {
                         Text("Home")
                     }
 
-                    // View All Recipes Tab
                     NavigationStack {
-                        ViewRecipesPage()
+                        RecipesView()
                             .environmentObject(settings)
                     }
                     .tabItem {
@@ -80,7 +75,6 @@ struct ContentView: View {
                         Image(systemName: "plus.circle.fill")
                         Text("Create")
                     }
-
                     // Settings Tab
                     NavigationStack {
                         SettingsPage()
@@ -100,15 +94,38 @@ struct ContentView: View {
                         Image(systemName: "person.fill")
                         Text("Profile")
                     }
+                    
+//                    // View All Square Recipes Tab
+//                    NavigationStack {SquareRecipe()
+//                            .environmentObject(settings)
+//                    }
+//                    .tabItem {
+//                        Image(systemName: "book.fill")
+//                        Text("Square Recipes")
+//                    }
+//                    // View All Recipes Tab
+//                    NavigationStack {
+//                        ViewRecipesPage()
+//                            .environmentObject(settings)
+//                    }
+//                    .tabItem {
+//                        Image(systemName: "book.fill")
+//                        Text("List Recipes")
+//                    }
+                   
                 }.accentColor(.pink)
                 .preferredColorScheme(settings.isDarkMode ? .dark : .light)
                 .onAppear {
-                    loadUserSettings() // Load settings when ContentView appears
+                    loadUserSettings() //Load settings when ContentView appears
                 }
             } else {
-                // Show LoginPage if not authenticated
+                //Show LoginPage if not authenticated
                 LoginPage(isAuthenticated: $isAuthenticated)
                     .environmentObject(settings)
+                    .onDisappear {
+                        //Ensure the `isAuthenticated` is reset to false when leaving the login screen
+                        isAuthenticated = DatabaseManager.shared.isUserAuthenticated()
+                    }
             }
         }
     }

@@ -22,9 +22,9 @@ struct SettingsPage: View {
     func saveUserSettings() {
         guard let username = currentUser?.username else { return }
         
-        isSaving = true  // Show loading state
+        isSaving = true
         
-        // Simulate saving delay for better UI feedback
+        //Simulate saving delay for better UI feedback
         DispatchQueue.global(qos: .background).async {
             settingsManager.saveUserSettings(
                 username: username,
@@ -34,7 +34,7 @@ struct SettingsPage: View {
                 measurementUnit: settings.measurementUnit
             )
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // Delay UI update
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { //Delay UI update
                 isSaving = false
             }
         }
@@ -71,7 +71,7 @@ struct SettingsPage: View {
                 .accessibilityLabel("Measurement Unit Selection")
             }
 
-            // Add Save Button
+            //Add Save Button
             Section {
                 Button(action: saveUserSettings) {
                     HStack {
@@ -83,10 +83,10 @@ struct SettingsPage: View {
                         }
                     }
                 }
-                .disabled(isSaving) // Disable the button while saving
+                .disabled(isSaving) //Disable the button while saving
             }
         }
         .navigationTitle("Settings")
-        .onAppear(perform: loadUserSettings) // Load user settings when the page appears
+        .onAppear(perform: loadUserSettings) //Load user settings when the page appears
     }
 }

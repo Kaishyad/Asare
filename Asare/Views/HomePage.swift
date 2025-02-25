@@ -5,16 +5,29 @@ struct HomePage: View {
     
     var body: some View {
         VStack {
-            Text("Welcome to the Recipe App")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding(.bottom, 20)
+            Text("Asare")
+                .font(.system(size: 60, weight: .bold))
+                .foregroundColor(.black)
+                .padding(.horizontal)
             
             Text("Enjoy browsing and creating recipes!")
-                .font(settings.font)
-                .padding()
+                .font(.system(size: 25, weight: .bold))
+                .fontWeight(.bold)
+                .foregroundColor(.pink)
+                .padding(.bottom, 20)
+                .multilineTextAlignment(.center)
+
+            HStack {
+                    Text("Favorites")
+                        .font(settings.font)
+                        .bold()
+                    Spacer()
+                }
 
             Spacer()
+            
+            
+            
         }
         .padding()
     }

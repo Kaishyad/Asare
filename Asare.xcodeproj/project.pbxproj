@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6309684A2D6BDA6200A6DCA3 /* SquareRecipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 630968492D6BDA6200A6DCA3 /* SquareRecipe.swift */; };
 		6328A1352D68D99F004DFA46 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 6328A1342D68D99F004DFA46 /* SQLite */; };
 		6328A1372D68DA16004DFA46 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328A1362D68DA16004DFA46 /* DatabaseManager.swift */; };
 		6328A13B2D68E041004DFA46 /* UsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328A13A2D68E041004DFA46 /* UsersListView.swift */; };
@@ -27,6 +28,8 @@
 		63406DFD2D4CE0BE006FA124 /* LoginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DFC2D4CE0BE006FA124 /* LoginPage.swift */; };
 		63406DFF2D4CE0CC006FA124 /* ProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406DFE2D4CE0CC006FA124 /* ProfilePage.swift */; };
 		63406E012D4CE47D006FA124 /* SignUpPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63406E002D4CE47D006FA124 /* SignUpPage.swift */; };
+		634091CD2D6CFE5A004A0821 /* RecipesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634091CC2D6CFE5A004A0821 /* RecipesView.swift */; };
+		634091D02D6D0AB2004A0821 /* RecipeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634091CF2D6D0AB2004A0821 /* RecipeDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +50,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		630968492D6BDA6200A6DCA3 /* SquareRecipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareRecipe.swift; sourceTree = "<group>"; };
 		6328A1362D68DA16004DFA46 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		6328A13A2D68E041004DFA46 /* UsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersListView.swift; sourceTree = "<group>"; };
 		6328A13C2D68E5CB004DFA46 /* UserSettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsManager.swift; sourceTree = "<group>"; };
@@ -69,6 +73,9 @@
 		63406DFC2D4CE0BE006FA124 /* LoginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
 		63406DFE2D4CE0CC006FA124 /* ProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePage.swift; sourceTree = "<group>"; };
 		63406E002D4CE47D006FA124 /* SignUpPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpPage.swift; sourceTree = "<group>"; };
+		634091CC2D6CFE5A004A0821 /* RecipesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipesView.swift; sourceTree = "<group>"; };
+		634091CF2D6D0AB2004A0821 /* RecipeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailView.swift; sourceTree = "<group>"; };
+		634091D12D6D130D004A0821 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +107,7 @@
 		6328A1402D69E52D004DFA46 /* Database Managers */ = {
 			isa = PBXGroup;
 			children = (
+				6328A13A2D68E041004DFA46 /* UsersListView.swift */,
 				6328A13C2D68E5CB004DFA46 /* UserSettingsManager.swift */,
 				6328A1362D68DA16004DFA46 /* DatabaseManager.swift */,
 				6328A13E2D69E476004DFA46 /* RecipeDatabaseManager.swift */,
@@ -130,13 +138,13 @@
 		63406DC52D4CAC7A006FA124 /* Asare */ = {
 			isa = PBXGroup;
 			children = (
-				63406E0D2D4CE988006FA124 /* Models */,
+				634091D12D6D130D004A0821 /* Info.plist */,
 				63406DC62D4CAC7A006FA124 /* AsareApp.swift */,
 				63406DCA2D4CAC7C006FA124 /* Assets.xcassets */,
-				63406E0F2D4CEA7F006FA124 /* Views */,
 				63406DCC2D4CAC7C006FA124 /* Preview Content */,
-				6328A13A2D68E041004DFA46 /* UsersListView.swift */,
+				63406E0F2D4CEA7F006FA124 /* Views */,
 				6328A1402D69E52D004DFA46 /* Database Managers */,
+				634091CE2D6D0002004A0821 /* ViewRecipePages */,
 			);
 			path = Asare;
 			sourceTree = "<group>";
@@ -166,27 +174,30 @@
 			path = AsareUITests;
 			sourceTree = "<group>";
 		};
-		63406E0D2D4CE988006FA124 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		63406E0F2D4CEA7F006FA124 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				63406DF02D4CACE1006FA124 /* ViewRecipesPage.swift */,
+				63406E002D4CE47D006FA124 /* SignUpPage.swift */,
 				63406DF22D4CADAB006FA124 /* CreateRecipePage.swift */,
 				63406DF42D4CADC4006FA124 /* SettingsPage.swift */,
 				63406DF62D4CAEC8006FA124 /* AppSettings.swift */,
 				63406DFA2D4CE023006FA124 /* HomePage.swift */,
 				63406DFC2D4CE0BE006FA124 /* LoginPage.swift */,
 				63406DFE2D4CE0CC006FA124 /* ProfilePage.swift */,
-				63406E002D4CE47D006FA124 /* SignUpPage.swift */,
 				63406DC82D4CAC7A006FA124 /* ContentView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		634091CE2D6D0002004A0821 /* ViewRecipePages */ = {
+			isa = PBXGroup;
+			children = (
+				634091CF2D6D0AB2004A0821 /* RecipeDetailView.swift */,
+				634091CC2D6CFE5A004A0821 /* RecipesView.swift */,
+				630968492D6BDA6200A6DCA3 /* SquareRecipe.swift */,
+				63406DF02D4CACE1006FA124 /* ViewRecipesPage.swift */,
+			);
+			path = ViewRecipePages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -327,7 +338,9 @@
 			files = (
 				63406DFF2D4CE0CC006FA124 /* ProfilePage.swift in Sources */,
 				63406DFD2D4CE0BE006FA124 /* LoginPage.swift in Sources */,
+				634091CD2D6CFE5A004A0821 /* RecipesView.swift in Sources */,
 				63406DC92D4CAC7A006FA124 /* ContentView.swift in Sources */,
+				6309684A2D6BDA6200A6DCA3 /* SquareRecipe.swift in Sources */,
 				63406DF12D4CACE1006FA124 /* ViewRecipesPage.swift in Sources */,
 				63406DF72D4CAEC8006FA124 /* AppSettings.swift in Sources */,
 				63406DF32D4CADAB006FA124 /* CreateRecipePage.swift in Sources */,
@@ -339,6 +352,7 @@
 				6328A1372D68DA16004DFA46 /* DatabaseManager.swift in Sources */,
 				63406DFB2D4CE023006FA124 /* HomePage.swift in Sources */,
 				63406DF52D4CADC4006FA124 /* SettingsPage.swift in Sources */,
+				634091D02D6D0AB2004A0821 /* RecipeDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -504,6 +518,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Asare/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Asare/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -532,6 +547,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Asare/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Asare/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

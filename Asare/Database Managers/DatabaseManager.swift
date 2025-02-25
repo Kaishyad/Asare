@@ -1,17 +1,22 @@
 import SQLite
 import Foundation
-import CryptoKit // For password hashing
+import CryptoKit //password hashing
 
 class DatabaseManager {
     static let shared = DatabaseManager()
     private var db: Connection?
 
     private let users = Table("users")
-    private let id = Expression<Int64>("id")
-    private let username = Expression<String>("username")
-    private let email = Expression<String>("email")
-    private let password = Expression<String>("password")
-    private let isLoggedIn = Expression<Bool>("isLoggedIn")
+        private let recipes = Table("recipes")
+        private let id = Expression<Int64>("id")
+        private let username = Expression<String>("username")
+        private let email = Expression<String>("email")
+        private let password = Expression<String>("password")
+        private let isLoggedIn = Expression<Bool>("isLoggedIn")
+        private let recipeName = Expression<String>("name")
+        private let recipeDescription = Expression<String>("description")
+        private let recipeFilters = Expression<String>("filters")
+        private let recipeUsername = Expression<String>("recipeUsername")
 
     private init() {
         do {
@@ -24,31 +29,11 @@ class DatabaseManager {
 
             db = try Connection(path)
             createUsersTable()
+            createRecipesTable()
         } catch {
             print("Error initializing database: \(error)")
         }
     }
-    func resetDatabase() {
-        do {
-            // Get the database file path
-            let path = FileManager.default
-                .urls(for: .documentDirectory, in: .userDomainMask)
-                .first!
-                .appendingPathComponent("app_database.sqlite")
-                .path
-            
-            // Check if the file exists, and delete it
-            if FileManager.default.fileExists(atPath: path) {
-                try FileManager.default.removeItem(atPath: path)
-                print("Database file deleted successfully!")
-            } else {
-                print("No database file found at path: \(path)")
-            }
-        } catch {
-            print("Error deleting database file: \(error)")
-        }
-    }
-
     private func createUsersTable() {
         do {
             // Ensure the table exists before interacting with it
@@ -71,13 +56,112 @@ class DatabaseManager {
             print("Error creating users table: \(error)")
         }
     }
+    // MARK: - Recipe Functions
+    private func createRecipesTable() {
+            do {
+                // Ensure the table exists before interacting with it
+                let exists = try db?.scalar("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='recipes'") as? Int64 ?? 0
+
+                if exists == 0 {
+                    // Table doesn't exist, so create it
+                    try db?.run(recipes.create { t in
+                        t.column(id, primaryKey: true)
+                        t.column(recipeName)
+                        t.column(recipeDescription)
+                        t.column(recipeFilters)
+                        t.column(recipeUsername) // Add column for username
+                    })
+                    print("Recipes table created!")
+                } else {
+                    print("Recipes table already exists!")
+                }
+            } catch {
+                print("Error creating recipes table: \(error)")
+            }
+        }
+
+        func addRecipe(username: String, name: String, description: String, selectedFilters: [String]) -> Bool {
+            let filters = selectedFilters.joined(separator: ", ")
+            
+            do {
+                // Insert recipe with associated username
+                try db?.run(recipes.insert(recipeName <- name, recipeDescription <- description, recipeFilters <- filters, recipeUsername <- username))
+                print("Recipe added successfully!")
+                return true
+            } catch {
+                print("Error adding recipe: \(error)")
+                return false
+            }
+        }
+
+        func fetchUserRecipes(username: String, completion: @escaping ([(name: String, description: String, filters: String)]) -> Void) {
+            do {
+                let query = recipes.filter(recipeUsername == username) // Fetch only user's recipes
+                var recipesList: [(name: String, description: String, filters: String)] = []
+
+                let rows = try db?.prepare(query)
+
+                for row in rows ?? AnySequence([]) {
+                    recipesList.append(
+                        (name: row[recipeName],
+                         description: row[recipeDescription],
+                         filters: row[recipeFilters])
+                    )
+                }
+
+                completion(recipesList)
+            } catch {
+                print("Error fetching user recipes: \(error)")
+                completion([])
+            }
+        }
+
+
+        func fetchAllUsers(completion: @escaping ([(username: String, email: String)]) -> Void) {
+            do {
+                let allUsers = try db?.prepare(users)
+                var usersList: [(username: String, email: String)] = []
+
+                if let allUsers = allUsers {
+                    for user in allUsers {
+                        usersList.append((username: user[username], email: user[email]))
+                    }
+                } else {
+                    print("No users found in the database.")
+                }
+                
+                completion(usersList)
+            } catch {
+                print("Error fetching users: \(error)")
+                completion([])
+            }
+        }
+    
+    func resetDatabase() {
+        do {
+            let path = FileManager.default
+                .urls(for: .documentDirectory, in: .userDomainMask)
+                .first!
+                .appendingPathComponent("app_database.sqlite")
+                .path
+            
+            if FileManager.default.fileExists(atPath: path) {
+                try FileManager.default.removeItem(atPath: path)
+                print("Database file deleted successfully!")
+            } else {
+                print("No database file found at path: \(path)")
+            }
+        } catch {
+            print("Error deleting database file: \(error)")
+        }
+    }
 
 
     func checkColumnExists() {
         do {
             let tableInfo = try db?.prepare("PRAGMA table_info(\(users))")
             for column in tableInfo! {
-                print(column[1]!) // Prints the column names in the users table
+                print(column[1]!)
             }
         } catch {
             print("Error checking columns: \(error)")
@@ -99,6 +183,24 @@ class DatabaseManager {
             print("Error updating password: \(error)")
         }
     }
+    func deleteUser(username: String) -> Bool {
+        let userToDelete = users.filter(self.username == username)
+        
+        do {
+            let deletedRows = try db?.run(userToDelete.delete())
+            if deletedRows ?? 0 > 0 {
+                print("User \(username) deleted successfully!")
+                return true
+            } else {
+                print("User \(username) not found.")
+                return false
+            }
+        } catch {
+            print("Error deleting user \(username): \(error)")
+            return false
+        }
+    }
+
 
 
 
@@ -126,9 +228,7 @@ class DatabaseManager {
         do {
             let query = users.filter(usernameColumn == username)
             if let user = try db?.pluck(query) {
-                // Compare the hashed password
                 if verifyPassword(input: password, stored: user[passwordColumn]) {
-                    // Mark user as logged in
                     let userToUpdate = users.filter(usernameColumn == username)
                     try db?.run(userToUpdate.update(isLoggedInColumn <- true)) // Set isLoggedIn to true
                     return true
@@ -156,7 +256,6 @@ class DatabaseManager {
 
     func getCurrentUser() -> (username: String, email: String)? {
         do {
-            // Retrieve the logged-in user
             let query = users.filter(isLoggedIn == true)
             if let user = try db?.pluck(query) {
                 return (username: user[username], email: user[email])
@@ -176,7 +275,7 @@ class DatabaseManager {
 
         do {
             let user = users.filter(self.username == currentUser.username)
-            try db?.run(user.update(isLoggedIn <- false))  // Mark user as logged out
+            try db?.run(user.update(isLoggedIn <- false))
             print("User logged out successfully!")
         } catch {
             print("Error during logout: \(error)")
@@ -193,43 +292,19 @@ class DatabaseManager {
         }
     }
 
-    func fetchAllUsers(completion: @escaping ([(username: String, email: String)]) -> Void) {
-        do {
-            // Fetch all users
-            let allUsers = try db?.prepare(users)
-            var usersList: [(username: String, email: String)] = []
-
-            if let allUsers = allUsers {
-                // Loop through and collect each user's info
-                for user in allUsers {
-                    usersList.append((username: user[username], email: user[email]))
-                }
-            } else {
-                print("No users found in the database.")
-            }
-            
-            // Call the completion handler with the result
-            completion(usersList)
-            
-        } catch {
-            print("Error fetching users: \(error)")
-            // Return an empty list on error
-            completion([])
-        }
-    }
+    
 
 
     func isUserAuthenticated() -> Bool {
         do {
-            // Check if any user has their 'isLoggedIn' field set to true
             let query = users.filter(isLoggedIn == true)
             if (try db?.pluck(query)) != nil {
-                return true // There's an authenticated user
+                return true
             }
         } catch {
             print("Error checking authentication: \(error)")
         }
-        return false // No authenticated user found
+        return false 
     }
 
 

@@ -7,13 +7,12 @@ struct ProfilePage: View {
     @State private var username: String = "No Username"
     @State private var email: String = "No Email"
     
-    // State variables for password change
     @State private var currentPassword: String = ""
     @State private var newPassword: String = ""
     @State private var confirmPassword: String = ""
     @State private var showPasswordChangeAlert = false
     @State private var passwordChangeMessage = ""
-    @State private var isPasswordSectionExpanded = false  // Tracks if password section is shown
+    @State private var isPasswordSectionExpanded = false
 
     var body: some View {
         VStack {
@@ -30,7 +29,6 @@ struct ProfilePage: View {
 
             Divider().padding(.vertical, 10)
 
-            // Toggle button for Change Password Section
             Button(action: {
                 withAnimation {
                     isPasswordSectionExpanded.toggle()
@@ -46,12 +44,11 @@ struct ProfilePage: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .background(Color.blue)
+                .background(Color.pink)
                 .cornerRadius(10)
             }
             .padding(.top)
 
-            // Collapsible Password Section
             if isPasswordSectionExpanded {
                 VStack {
                     SecureField("Current Password", text: $currentPassword)
@@ -67,17 +64,19 @@ struct ProfilePage: View {
                         .padding()
 
                     Button(action: changePassword) {
-                        Text("Update Password")
+                        Text("Update")
                             .font(settings.font)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.green)
+                            .padding(.horizontal, 15)
+                            .padding(.vertical, 8)
+                            .background(Color.pink)  // Sleek accent color
                             .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .cornerRadius(20)  // Rounded corners
+                            .frame(maxWidth: .infinity)
+                            .shadow(radius: 5)  // Subtle shadow
                     }
                     .padding(.top, 10)
                 }
-                .transition(.slide) // Smooth slide transition
+                .transition(.slide)
             }
 
             Divider().padding(.vertical, 10)
@@ -150,7 +149,7 @@ struct ProfilePage: View {
         DatabaseManager.shared.logoutUser()
         isAuthenticated = false
 
-        // Reset settings to default values when logging out
+        //Reset settings to default values when logging out
         settings.isDarkMode = false
         settings.fontSize = 16
         settings.useDyslexiaFont = false

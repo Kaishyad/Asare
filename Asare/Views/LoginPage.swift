@@ -16,13 +16,12 @@ struct LoginPage: View {
                 .fontWeight(.bold)
                 .padding(.bottom, 20)
             
-            // Wrap inputs inside a Form or VStack with spacing
             VStack(spacing: 15) {
                 TextField("Username", text: $username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-                    .autocapitalization(.none) // Avoid auto-capitalizing usernames
-                    .disableAutocorrection(true) // Avoid auto-correction issues
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
                 
                 SecureField("Password", text: $password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -46,7 +45,6 @@ struct LoginPage: View {
             }
             .padding(.top, 20)
             
-            // Navigate to SignUp page
             Button(action: {
                 isNavigatingToSignUp = true
             }) {
@@ -59,7 +57,7 @@ struct LoginPage: View {
                 NavigationLink(destination: SignUpPage(isAuthenticated: $isAuthenticated), isActive: $isNavigatingToSignUp) {
                     EmptyView()
                 }
-                .hidden() // Prevents blocking other elements
+                .hidden()
             )
 
             Spacer()
@@ -68,14 +66,11 @@ struct LoginPage: View {
     }
     
     private func handleLogin() {
-        // Call the DatabaseManager to validate user credentials
         if DatabaseManager.shared.validateUser(username: username, password: password) {
-            // On successful login, set authentication state and persist it in UserDefaults
             UserDefaults.standard.set(true, forKey: "isAuthenticated")
             isAuthenticated = true
-            errorMessage = nil  // Clear any previous error message
+            errorMessage = nil
         } else {
-            // If login fails, show an error message
             errorMessage = "Invalid username or password"
         }
     }
