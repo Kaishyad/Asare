@@ -30,10 +30,17 @@ struct SignUpPage: View {
                 SecureField("Password", text: $password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-                
+                    .textContentType(.newPassword) // Disables strong password suggestion
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+
                 SecureField("Confirm Password", text: $confirmPassword)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
+                    .textContentType(.newPassword) // Ensures strong password prompt is not auto-filled
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+
                 
                 if let errorMessage = errorMessage {
                     Text(errorMessage)

@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct RecipeDetailView: View {
-    var recipe: (name: String, description: String, filters: [String])
-    @Environment(\.presentationMode) var presentationMode  // Allows navigation back
+    let recipe: (name: String, description: String, filters: [String], isFavorite: Bool)
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         ScrollView {
@@ -48,8 +48,4 @@ struct RecipeDetailView: View {
             presentationMode.wrappedValue.dismiss() // Go back to RecipeView
         }
     }
-}
-
-#Preview {
-    RecipeDetailView(recipe: (name: "Spaghetti", description: "A classic Italian dish", filters: ["Vegetarian", "Quick"]))
 }

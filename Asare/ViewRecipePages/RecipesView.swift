@@ -2,15 +2,14 @@ import SwiftUI
 
 struct RecipesView: View {
     @EnvironmentObject var settings: AppSettings
-    @State private var recipes: [(name: String, description: String, filters: [String])] = []
+    @State private var recipes: [(name: String, description: String, filters: [String], isFavorite: Bool)] = []
     @State private var searchText: String = ""
     @State private var isGridView: Bool = false
-    @State private var favoriteStates: [Bool] = []
     
     let allFilters = RecipeDatabaseManager.shared.getAllFilters()
     @State private var selectedFilters: [String] = [] // Tracks user-selected filters
     
-    var filteredRecipes: [(name: String, description: String, filters: [String])] {
+    var filteredRecipes: [(name: String, description: String, filters: [String], isFavorite: Bool)] {
         recipes.filter { recipe in
             let matchesSearch = searchText.isEmpty ||
                 recipe.name.localizedCaseInsensitiveContains(searchText) ||
@@ -75,9 +74,7 @@ struct RecipesView: View {
                 
                 if isGridView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 20), GridItem(.flexible(), spacing: 20)], spacing: 20) {
-                        ForEach(0..<filteredRecipes.count, id: \.self) { index in
-                            let recipe = filteredRecipes[index]
-
+                        ForEach(filteredRecipes, id: \.name) { recipe in
                             NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
                                 VStack {
                                     Text(recipe.name)
@@ -91,7 +88,7 @@ struct RecipesView: View {
                                         .lineLimit(2)
 
                                     if !recipe.filters.isEmpty {
-                                        Text("Filters: \(recipe.filters.joined(separator: ", "))")
+                                        Text(" \(recipe.filters.joined(separator: ", "))")
                                             .font(.subheadline)
                                             .foregroundColor(.pink)
                                             .lineLimit(1)
@@ -99,11 +96,10 @@ struct RecipesView: View {
 
                                     Spacer()
 
-                                    Button(action: {
-                                        favoriteStates[index].toggle()
-                                    }) {
-                                        Image(systemName: favoriteStates[index] ? "heart.fill" : "heart")
-                                            .foregroundColor(favoriteStates[index] ? .pink : .gray)
+                                    // Heart button with no action
+                                    Button(action: {}) {
+                                        Image(systemName: "heart")
+                                            .foregroundColor(.gray)
                                             .font(.title)
                                     }
                                     .padding(.top)
@@ -120,21 +116,32 @@ struct RecipesView: View {
                 } else {
                     List {
                         ForEach(filteredRecipes, id: \.name) { recipe in
-                            NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
-                                VStack(alignment: .leading) {
-                                    Text(recipe.name)
-                                        .font(.headline)
-                                    Text(recipe.description)
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
-
-                                    if !recipe.filters.isEmpty {
-                                        Text("Filters: \(recipe.filters.joined(separator: ", "))")
+                            HStack {
+                                NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                                    VStack(alignment: .leading) {
+                                        Text(recipe.name)
+                                            .font(.headline)
+                                        Text(recipe.description)
                                             .font(.subheadline)
-                                            .foregroundColor(.pink)
+                                            .foregroundColor(.gray)
+
+                                        if !recipe.filters.isEmpty {
+                                            Text("\(recipe.filters.joined(separator: ", "))")
+                                                .font(.subheadline)
+                                                .foregroundColor(.pink)
+                                        }
                                     }
+                                    .padding(.vertical, 5)
                                 }
-                                .padding(.vertical, 5)
+                                
+                                Spacer()
+
+                                // Heart button with no action
+                                Button(action: {}) {
+                                    Image(systemName: "heart")
+                                        .foregroundColor(.gray)
+                                        .font(.title2)
+                                }
                             }
                         }
                     }
@@ -155,7 +162,6 @@ struct RecipesView: View {
 
         RecipeDatabaseManager.shared.fetchRecipesForUser(username: currentUser.username) { fetchedRecipes in
             self.recipes = fetchedRecipes
-            self.favoriteStates = Array(repeating: false, count: fetchedRecipes.count)
         }
     }
 }

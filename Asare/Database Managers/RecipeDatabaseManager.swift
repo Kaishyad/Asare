@@ -19,6 +19,10 @@ class RecipeDatabaseManager {
     private let recipeId = Expression<Int64>("recipe_id")
     private let filterIdRef = Expression<Int64>("filter_id")
 
+    private let favorites = Table("favorites")
+    private let favoriteId = Expression<Int64>("id")
+    private let recipeIdRef = Expression<Int64>("recipe_id")
+
     private let defaultFilters = ["Vegetarian", "Quick", "Spicy", "High-Protein", "Gluten-Free", "Vegan", "Dairy-Free", "Keto"]
 
     private init() {
@@ -45,6 +49,7 @@ class RecipeDatabaseManager {
                 t.column(username)
                 t.column(name)
                 t.column(description)
+                t.column(description)
             })
 
             try db?.run(filters.create(ifNotExists: true) { t in
@@ -58,12 +63,61 @@ class RecipeDatabaseManager {
                 t.foreignKey(recipeId, references: recipes, id)
                 t.foreignKey(filterIdRef, references: filters, filterId)
             })
+            try db?.run(favorites.create(ifNotExists: true) { t in
+                t.column(favoriteId, primaryKey: true)
+                t.column(recipeIdRef)
+                t.column(username)
+                t.foreignKey(recipeIdRef, references: recipes, id)
+            })
 
             print("Tables created successfully!")
         } catch {
             print("Error creating tables: \(error)")
         }
     }
+    func addFavorite(recipeId: Int64, username: String) -> Bool {
+        do {
+            let existingFavorite = favorites.filter(recipeIdRef == recipeId && self.username == username)
+            if try db?.pluck(existingFavorite) == nil {
+                try db?.run(favorites.insert(recipeIdRef <- recipeId, self.username <- username))
+            }
+            return true
+        } catch {
+            print("Error adding favorite: \(error)")
+            return false
+        }
+    }
+
+    func removeFavorite(recipeId: Int64, username: String) -> Bool {
+        do {
+            let favoriteToDelete = favorites.filter(recipeIdRef == recipeId && self.username == username)
+            try db?.run(favoriteToDelete.delete())
+            return true
+        } catch {
+            print("Error removing favorite: \(error)")
+            return false
+        }
+    }
+
+    func getFavoritesForUser(username: String) -> [Int64] {
+        do {
+            return try db?.prepare(favorites.filter(self.username == username)).map { $0[recipeIdRef] } ?? []
+        } catch {
+            print("Error fetching favorites: \(error)")
+            return []
+        }
+    }
+    func isFavorite(recipeId: Int64, username: String) -> Bool {
+        do {
+            return try db?.pluck(favorites.filter(recipeIdRef == recipeId && self.username == username)) != nil
+        } catch {
+            print("Error checking favorite status: \(error)")
+            return false
+        }
+    }
+
+
+
 
     private func insertDefaultFilters() {
         do {
@@ -101,23 +155,25 @@ class RecipeDatabaseManager {
         }
     }
 
-    func addRecipe(username: String, name: String, description: String, selectedFilters: [String]) -> Bool {
+    func addRecipe(username: String, name: String, description: String, selectedFilters: [String]) -> Int64? {
         do {
             let recipeId = try db?.run(recipes.insert(self.username <- username, self.name <- name, self.description <- description))
+            guard let newRecipeId = recipeId else { return nil } // Ensure recipeId is valid
 
             for filter in selectedFilters {
                 let filterQuery = filters.filter(filterName == filter)
                 if let filterRow = try db?.pluck(filterQuery) {
                     let filterIdValue = filterRow[filterId]
-                    try db?.run(recipeFilters.insert(self.recipeId <- recipeId!, self.filterIdRef <- filterIdValue))
+                    try db?.run(recipeFilters.insert(self.recipeId <- newRecipeId, self.filterIdRef <- filterIdValue))
                 }
             }
 
-            return true
+            return newRecipeId
         } catch {
             print("Error adding recipe with filters: \(error)")
-            return false
+            return nil
         }
+
     }
 
     func deleteRecipe(name: String) -> Bool {
@@ -150,11 +206,11 @@ class RecipeDatabaseManager {
         }
     }
 
-    func fetchRecipesForUser(username: String, completion: @escaping ([(name: String, description: String, filters: [String])]) -> Void) {
+    func fetchRecipesForUser(username: String, completion: @escaping ([(name: String, description: String, filters: [String], isFavorite: Bool)]) -> Void) {
         do {
             let query = recipes.filter(self.username == username)
             let allRecipes = try db?.prepare(query)
-            var fetchedRecipes: [(name: String, description: String, filters: [String])] = []
+            var fetchedRecipes: [(name: String, description: String, filters: [String], isFavorite: Bool)] = []
 
             for recipe in allRecipes! {
                 let recipeName = recipe[self.name]
@@ -168,7 +224,10 @@ class RecipeDatabaseManager {
                     recipeFiltersList.append(filter[filters[self.filterName]])
                 }
 
-                fetchedRecipes.append((name: recipeName, description: recipeDescription, filters: recipeFiltersList))
+                // Check if the recipe is a favorite for the user
+                let isFavorite = try db?.pluck(favorites.filter(recipeIdRef == recipe[self.id] && self.username == username)) != nil
+
+                fetchedRecipes.append((name: recipeName, description: recipeDescription, filters: recipeFiltersList, isFavorite: isFavorite))
             }
 
             completion(fetchedRecipes)
@@ -177,4 +236,5 @@ class RecipeDatabaseManager {
             completion([])
         }
     }
+
 }
