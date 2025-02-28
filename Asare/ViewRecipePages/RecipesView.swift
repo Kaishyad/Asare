@@ -2,14 +2,15 @@ import SwiftUI
 
 struct RecipesView: View {
     @EnvironmentObject var settings: AppSettings
-    @State private var recipes: [(name: String, description: String, filters: [String], isFavorite: Bool)] = []
     @State private var searchText: String = ""
     @State private var isGridView: Bool = false
-    
-    let allFilters = RecipeDatabaseManager.shared.getAllFilters()
+    @State private var favoriteStates: [Bool] = []
+
+    let allFilters = FilterManager.shared.getAllFilters()
     @State private var selectedFilters: [String] = [] // Tracks user-selected filters
-    
-    var filteredRecipes: [(name: String, description: String, filters: [String], isFavorite: Bool)] {
+    @State private var recipes: [(id: Int64, name: String, description: String, filters: [String])] = []
+
+    var filteredRecipes: [(id: Int64, name: String, description: String, filters: [String])] {
         recipes.filter { recipe in
             let matchesSearch = searchText.isEmpty ||
                 recipe.name.localizedCaseInsensitiveContains(searchText) ||
@@ -74,7 +75,9 @@ struct RecipesView: View {
                 
                 if isGridView {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 20), GridItem(.flexible(), spacing: 20)], spacing: 20) {
-                        ForEach(filteredRecipes, id: \.name) { recipe in
+                        ForEach(0..<filteredRecipes.count, id: \.self) { index in
+                            let recipe = filteredRecipes[index]
+                            
                             NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
                                 VStack {
                                     Text(recipe.name)
@@ -96,10 +99,17 @@ struct RecipesView: View {
 
                                     Spacer()
 
-                                    // Heart button with no action
-                                    Button(action: {}) {
-                                        Image(systemName: "heart")
-                                            .foregroundColor(.gray)
+                                    Button(action: {
+                                        let isFavorite = favoriteStates[index]
+                                        if isFavorite {
+                                            removeFromFavorites(recipeId: recipe.id)
+                                        } else {
+                                            addToFavorites(recipeId: recipe.id)
+                                        }
+                                        favoriteStates[index].toggle() // Toggle the state
+                                    }) {
+                                        Image(systemName: favoriteStates[index] ? "heart.fill" : "heart")
+                                            .foregroundColor(favoriteStates[index] ? .pink : .gray)
                                             .font(.title)
                                     }
                                     .padding(.top)
@@ -116,32 +126,22 @@ struct RecipesView: View {
                 } else {
                     List {
                         ForEach(filteredRecipes, id: \.name) { recipe in
-                            HStack {
-                                NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
-                                    VStack(alignment: .leading) {
-                                        Text(recipe.name)
-                                            .font(.headline)
-                                        Text(recipe.description)
-                                            .font(.subheadline)
-                                            .foregroundColor(.gray)
-
-                                        if !recipe.filters.isEmpty {
-                                            Text("\(recipe.filters.joined(separator: ", "))")
-                                                .font(.subheadline)
-                                                .foregroundColor(.pink)
-                                        }
-                                    }
-                                    .padding(.vertical, 5)
-                                }
-                                
-                                Spacer()
-
-                                // Heart button with no action
-                                Button(action: {}) {
-                                    Image(systemName: "heart")
+                            NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                                VStack(alignment: .leading) {
+                                    Text(recipe.name)
+                                        .font(.headline)
+                                    Text(recipe.description)
+                                        .font(.subheadline)
                                         .foregroundColor(.gray)
-                                        .font(.title2)
+
+                                    if !recipe.filters.isEmpty {
+                                        Text("\(recipe.filters.joined(separator: ", "))")
+                                            .font(.subheadline)
+                                            .foregroundColor(.pink)
+                                    }
+                                    
                                 }
+                                .padding(.vertical, 5)
                             }
                         }
                     }
@@ -162,6 +162,38 @@ struct RecipesView: View {
 
         RecipeDatabaseManager.shared.fetchRecipesForUser(username: currentUser.username) { fetchedRecipes in
             self.recipes = fetchedRecipes
+            fetchFavorites() 
         }
     }
+
+    private func fetchFavorites() {
+        guard let currentUser = DatabaseManager.shared.getCurrentUser() else {
+            print("No user logged in")
+            return
+        }
+        
+        let favoriteIds = RecipeDatabaseManager.shared.getFavoritesForUser(username: currentUser.username)
+        self.favoriteStates = recipes.map { recipe in
+            return favoriteIds.contains(recipe.id)
+        }
+    }
+
+    private func addToFavorites(recipeId: Int64) {
+        guard let currentUser = DatabaseManager.shared.getCurrentUser() else {
+            print("No user logged in")
+            return
+        }
+
+        let _ = RecipeDatabaseManager.shared.addFavorite(username: currentUser.username, recipeId: recipeId)
+    }
+
+    private func removeFromFavorites(recipeId: Int64) {
+        guard let currentUser = DatabaseManager.shared.getCurrentUser() else {
+            print("No user logged in")
+            return
+        }
+
+        let _ = RecipeDatabaseManager.shared.removeFavorite(username: currentUser.username, recipeId: recipeId)
+    }
+  
 }

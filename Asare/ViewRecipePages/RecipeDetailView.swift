@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RecipeDetailView: View {
-    let recipe: (name: String, description: String, filters: [String], isFavorite: Bool)
+    var recipe: (id: Int64, name: String, description: String, filters: [String])
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -16,7 +16,8 @@ struct RecipeDetailView: View {
                     .font(.body)
                     .foregroundColor(.gray)
                     .padding(.top)
-
+                
+    
                 if !recipe.filters.isEmpty {
                     Text("Filters: \(recipe.filters.joined(separator: ", "))")
                         .font(.subheadline)
@@ -46,6 +47,8 @@ struct RecipeDetailView: View {
         let success = RecipeDatabaseManager.shared.deleteRecipe(name: recipe.name)
         if success {
             presentationMode.wrappedValue.dismiss() // Go back to RecipeView
+        } else {
+            print("Failed to delete recipe")
         }
     }
 }
