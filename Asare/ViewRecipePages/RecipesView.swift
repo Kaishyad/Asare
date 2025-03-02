@@ -162,7 +162,7 @@ struct RecipesView: View {
 
         RecipeDatabaseManager.shared.fetchRecipesForUser(username: currentUser.username) { fetchedRecipes in
             self.recipes = fetchedRecipes
-            fetchFavorites() 
+            fetchFavorites()
         }
     }
 

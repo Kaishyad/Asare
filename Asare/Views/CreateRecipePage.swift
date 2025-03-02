@@ -12,150 +12,144 @@ struct CreateRecipePage: View {
     @State private var currentUser: String = ""
     @State private var showSuccessBanner: Bool = false // Variable to control the banner visibility
     @State private var successMessage: String = "" // Success message to display
-    
+    @State private var recipeTime: String = "" // Time input as a string
+    @State private var isIngredientsExpanded = false
+
+    // Ingredients state variables
+    @State private var ingredients: [(name: String, amount: String, measurement: String)] = []
+
     var body: some View {
-        VStack {
-            // Success Banner
-            if showSuccessBanner {
-                Text(successMessage)
+        NavigationView {
+            VStack {
+                // Success Banner
+                if showSuccessBanner {
+                    Text(successMessage)
+                        .font(settings.font)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .transition(.move(edge: .top))
+                        .animation(.easeInOut, value: showSuccessBanner)
+                }
+
+                Text("Create New Recipe")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                    .padding(.horizontal)
+
+                TextField("Enter Recipe Name", text: $recipeName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
                     .font(settings.font)
                     .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .transition(.move(edge: .top))
-                    .animation(.easeInOut, value: showSuccessBanner)
-            }
-            
-            Text("Create New Recipe")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(.black)
-                .padding(.horizontal)
-            
-            TextField("Enter Recipe Name", text: $recipeName)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .font(settings.font)
-                .padding()
-            
-            TextField("Enter Recipe Description", text: $recipeDescription)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .font(settings.font)
-                .padding()
-            
-            // Filters Section
-            VStack(alignment: .leading) {
-                Button(action: { isFiltersExpanded.toggle() }) {
-                    HStack {
-                        Text("Filters: \(selectedFilters.isEmpty ? "None" : selectedFilters.joined(separator: ", "))")
-                            .font(settings.font)
-                            .foregroundColor(.pink)
-                        Spacer()
-                        Image(systemName: isFiltersExpanded ? "chevron.up" : "chevron.down")
-                            .foregroundColor(.pink)
+
+                TextField("Enter Recipe Description", text: $recipeDescription)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .font(settings.font)
+                    .padding()
+
+                // Ingredients Section
+                VStack(alignment: .leading) {
+                    NavigationLink(destination: AddIngredientsView(ingredients: $ingredients)) {
+                        Text("Add Ingredients")
+                            .font(.body)
+                            .foregroundColor(.blue)
+                            .padding()
+                            .background(Color.pink.opacity(0.1))
+                            .cornerRadius(10)
                     }
-                    .padding(.top)
+
+                    // Display list of added ingredients
+                    List(ingredients, id: \.name) { ingredient in
+                        Text("\(ingredient.amount) \(ingredient.measurement) of \(ingredient.name)")
+                    }
                 }
-                
-                if isFiltersExpanded {
-                    ScrollView {
-                        VStack(alignment: .leading) {
-                            ForEach(allFilters, id: \.self) { filter in
-                                HStack {
-                                    Button(action: { toggleFilter(filter) }) {
-                                        Image(systemName: selectedFilters.contains(filter) ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(selectedFilters.contains(filter) ? .pink : .gray) // Changed to pink
+
+                // Filters Section
+                VStack(alignment: .leading) {
+                    Button(action: { isFiltersExpanded.toggle() }) {
+                        HStack {
+                            Text("Filters: \(selectedFilters.isEmpty ? "None" : selectedFilters.joined(separator: ", "))")
+                                .font(settings.font)
+                                .foregroundColor(.pink)
+                            Spacer()
+                            Image(systemName: isFiltersExpanded ? "chevron.up" : "chevron.down")
+                                .foregroundColor(.pink)
+                        }
+                        .padding(.top)
+                    }
+
+                    if isFiltersExpanded {
+                        ScrollView {
+                            VStack(alignment: .leading) {
+                                ForEach(allFilters, id: \.self) { filter in
+                                    HStack {
+                                        Button(action: { toggleFilter(filter) }) {
+                                            Image(systemName: selectedFilters.contains(filter) ? "checkmark.circle.fill" : "circle")
+                                                .foregroundColor(selectedFilters.contains(filter) ? .pink : .gray)
+                                        }
+                                        .padding(.trailing, 5)
+
+                                        Text(filter)
+
+                                        Spacer()
+
+                                        Button(action: { deleteFilter(filter) }) {
+                                            Image(systemName: "trash")
+                                                .foregroundColor(.red)
+                                        }
                                     }
-                                    .padding(.trailing, 5)
-                                    
-                                    Text(filter)
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: { deleteFilter(filter) }) {
-                                        Image(systemName: "trash")
-                                            .foregroundColor(.red)
-                                    }
+                                    .padding(.vertical, 5)
                                 }
-                                .padding(.vertical, 5)
-                            }
-                            
-                            HStack {
-                                TextField("Custom Filter", text: $customFilterName)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .font(settings.font)
-                                    .padding()
-                                
-                                Button(action: addCustomFilter) {
-                                    Text("Add Filter")
-                                        .font(settings.font)
-                                        .padding()
-                                        .background(Color.pink) // Changed to pink
-                                        .foregroundColor(.white)
-                                        .cornerRadius(10)
-                                }
-                                .disabled(customFilterName.isEmpty)
                             }
                         }
+                        .frame(maxHeight: 200)
                     }
-                    .frame(maxHeight: 200)
+                }
+
+                VStack {
+                    TextField("Enter Time (in minutes)", text: $recipeTime)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .font(settings.font)
+                        .padding()
+
+                    Button(action: saveRecipe) {
+                        Text(isSaving ? "Saving..." : "Save Recipe")
+                            .font(settings.font)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.pink)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .disabled(isSaving || recipeName.isEmpty || recipeDescription.isEmpty || recipeTime.isEmpty || ingredients.isEmpty) // Disable if any field is empty
+
+                    Spacer()
                 }
             }
-            
-            Button(action: saveRecipe) {
-                Text(isSaving ? "Saving..." : "Save Recipe")
-                    .font(settings.font)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.pink) // Changed to pink
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
-            .disabled(isSaving || recipeName.isEmpty || recipeDescription.isEmpty) // Disabling save button if necessary
-            
-            Spacer()
-        }
-        .navigationTitle("New Recipe")
-        .padding()
-        .onAppear {
-            loadFilters()
-            if let currentUser = DatabaseManager.shared.getCurrentUser() {
-                self.currentUser = currentUser.username
+            .navigationTitle("New Recipe")
+            .padding()
+            .onAppear {
+                loadFilters()
+                if let currentUser = DatabaseManager.shared.getCurrentUser() {
+                    self.currentUser = currentUser.username
+                }
             }
         }
     }
 
-    // Load all available filters
-    private func loadFilters() {
-        allFilters = FilterManager.shared.getAllFilters()
-    }
-    
-    // Add a custom filter
-    private func addCustomFilter() {
-        if !customFilterName.isEmpty {
-            let success = FilterManager.shared.addFilter(name: customFilterName)
-            if success {
-                loadFilters()
-                customFilterName = "" // Reset the custom filter name field
-            } else {
-                print("Failed to add filter to database")
-            }
-        }
-    }
-    
-    // Toggle the selection of a filter
-    private func toggleFilter(_ filter: String) {
-        if selectedFilters.contains(filter) {
-            selectedFilters.remove(filter)
-        } else {
-            selectedFilters.insert(filter)
-        }
-    }
-    
-    // Save the recipe with the selected filters
+    // Save the recipe with the selected filters and ingredients
     private func saveRecipe() {
         guard !currentUser.isEmpty else {
             print("No user logged in")
+            return
+        }
+
+        // Ensure the recipe time is a valid integer
+        guard let time = Int(recipeTime), time > 0 else {
+            print("Invalid time input")
             return
         }
 
@@ -165,7 +159,9 @@ struct CreateRecipePage: View {
             username: currentUser,
             name: recipeName,
             description: recipeDescription,
-            selectedFilters: Array(selectedFilters) // Convert Set to Array for saving
+            time: time, // Pass the time value
+            selectedFilters: Array(selectedFilters), // Convert Set to Array for saving
+            ingredients: ingredients // Pass the ingredients list with amount
         )
 
         if success {
@@ -181,13 +177,29 @@ struct CreateRecipePage: View {
             recipeName = ""
             recipeDescription = ""
             selectedFilters.removeAll()
+            recipeTime = "" // Reset the time field
+            ingredients.removeAll() // Clear the ingredients list
         } else {
             print("Failed to save recipe")
         }
 
         isSaving = false
     }
-    
+
+    // Load all available filters
+    private func loadFilters() {
+        allFilters = FilterManager.shared.getAllFilters()
+    }
+
+    // Toggle the selection of a filter
+    private func toggleFilter(_ filter: String) {
+        if selectedFilters.contains(filter) {
+            selectedFilters.remove(filter)
+        } else {
+            selectedFilters.insert(filter)
+        }
+    }
+
     // Delete a selected filter
     private func deleteFilter(_ filter: String) {
         let success = FilterManager.shared.deleteFilter(name: filter)

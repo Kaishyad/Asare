@@ -5,12 +5,16 @@ class RecipeDatabaseManager {
     static let shared = RecipeDatabaseManager()
     private var db: Connection?
 
-    private let recipes = Table("recipes")
-    private let id = Expression<Int64>("id")
+     let recipes = Table("recipes")
+     let id = Expression<Int64>("id")
     private let username = Expression<String>("username")
     private let name = Expression<String>("name")
     private let description = Expression<String>("description")
+    private let time = Expression<Int>("time") // Add time as an integer (minutes)
 
+    var recipeTable: Table { return recipes }
+    var recipeIdExpression: Expression<Int64> { return id }
+    
     private let recipeFilters = Table("recipe_filters")
     private let recipeId = Expression<Int64>("recipe_id")
     private let filterIdRef = Expression<Int64>("filter_id")
@@ -25,7 +29,7 @@ class RecipeDatabaseManager {
         //dropTables()  // Delete existing tables
         createRecipesTable()
         createRecipeFiltersTable()  
-
+        createFavoritesTable()
     }
     private func dropTables() {
         do {
@@ -47,12 +51,14 @@ class RecipeDatabaseManager {
                 t.column(username)
                 t.column(name)
                 t.column(description)
+                t.column(time) // Add the time column
             })
             print("Recipes table created successfully!")
         } catch {
             print("Error creating recipes table: \(error)")
         }
     }
+
     
     private func createFavoritesTable() {
         do {
@@ -84,27 +90,31 @@ class RecipeDatabaseManager {
 
     // MARK: - Basic Recipe
 
-    func addRecipe(username: String, name: String, description: String, selectedFilters: [String]) -> Bool {
+    func addRecipe(username: String, name: String, description: String, time: Int, selectedFilters: [String], ingredients: [(name: String, amount: String, measurement: String)]) -> Bool {
         do {
-            guard let recipeId = try db?.run(recipes.insert(self.username <- username, self.name <- name, self.description <- description)) else {
+            guard let recipeId = try db?.run(recipes.insert(self.username <- username, self.name <- name, self.description <- description, self.time <- time)) else {
                 print("Error: Failed to insert recipe.")
                 return false
             }
-            
+
+            // Add ingredients
+            IngredientManager.shared.addIngredients(recipeId: recipeId, ingredientList: ingredients)
+
             // Insert relationships between recipe and filters
             for filter in selectedFilters {
                 if let filterIdValue = FilterManager.shared.getFilterIdByName(filter) {
                     try db?.run(recipeFilters.insert(self.recipeId <- recipeId, self.filterIdRef <- filterIdValue))
                 }
             }
-            
+
             return true
         } catch {
             print("Error adding recipe: \(error)")
             return false
         }
-
     }
+
+
 
     func fetchRecipesForUser(username: String, completion: @escaping ([(id: Int64, name: String, description: String, filters: [String])]) -> Void) {
         do {

@@ -3,6 +3,7 @@ import SwiftUI
 struct RecipeDetailView: View {
     var recipe: (id: Int64, name: String, description: String, filters: [String])
     @Environment(\.presentationMode) var presentationMode
+    @State private var ingredients: [(name: String, amount: String, measurement: String)] = []
 
     var body: some View {
         ScrollView {
@@ -16,12 +17,36 @@ struct RecipeDetailView: View {
                     .font(.body)
                     .foregroundColor(.gray)
                     .padding(.top)
-                
-    
+
+                // Display filters if any
                 if !recipe.filters.isEmpty {
                     Text("Filters: \(recipe.filters.joined(separator: ", "))")
                         .font(.subheadline)
                         .foregroundColor(.pink)
+                        .padding(.top)
+                }
+
+                // Display ingredients
+                if !ingredients.isEmpty {
+                    Text("Ingredients:")
+                        .font(.headline)
+                        .foregroundColor(.pink)
+                        .padding(.top)
+                    
+                    ForEach(ingredients, id: \.name) { ingredient in
+                        HStack {
+                            Text(ingredient.name)
+                                .font(.body)
+                            Spacer()
+                            Text(ingredient.measurement)
+                                .font(.body)
+                        }
+                        .padding(.vertical, 5)
+                    }
+                } else {
+                    Text("No ingredients available")
+                        .font(.body)
+                        .foregroundColor(.gray)
                         .padding(.top)
                 }
 
@@ -40,6 +65,9 @@ struct RecipeDetailView: View {
                 }
             }
         }
+        .onAppear {
+            fetchIngredients()
+        }
     }
 
     // Function to delete the recipe
@@ -50,5 +78,10 @@ struct RecipeDetailView: View {
         } else {
             print("Failed to delete recipe")
         }
+    }
+
+    // Fetch ingredients for the recipe when the view appears
+    private func fetchIngredients() {
+        ingredients = IngredientManager.shared.fetchIngredientsForRecipe(recipeId: recipe.id)
     }
 }
