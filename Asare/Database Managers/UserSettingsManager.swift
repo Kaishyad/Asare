@@ -5,11 +5,11 @@ class UserSettingsManager {
     private var db: Connection?
 
     private let userSettings = Table("userSettings")
-    private let username = Expression<String>("username")
-    private let darkMode = Expression<Bool>("darkMode")
-    private let fontSize = Expression<Double>("fontSize")
-    private let useDyslexiaFont = Expression<Bool>("useDyslexiaFont")
-    private let measurementUnit = Expression<String>("measurementUnit")
+    private let username = SQLite.Expression<String>("username")
+    private let darkMode = SQLite.Expression<Bool>("darkMode")
+    private let fontSize = SQLite.Expression<Double>("fontSize")
+    private let useDyslexiaFont = SQLite.Expression<Bool>("useDyslexiaFont")
+    private let measurementUnit = SQLite.Expression<String>("measurementUnit")
 
     private init() {
         do {

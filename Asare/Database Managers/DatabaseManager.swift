@@ -8,15 +8,15 @@ class DatabaseManager {
 
     private let users = Table("users")
         private let recipes = Table("recipes")
-        private let id = Expression<Int64>("id")
-        private let username = Expression<String>("username")
-        private let email = Expression<String>("email")
-        private let password = Expression<String>("password")
-        private let isLoggedIn = Expression<Bool>("isLoggedIn")
-        private let recipeName = Expression<String>("name")
-        private let recipeDescription = Expression<String>("description")
-        private let recipeFilters = Expression<String>("filters")
-        private let recipeUsername = Expression<String>("recipeUsername")
+        private let id = SQLite.Expression<Int64>("id")
+        private let username = SQLite.Expression<String>("username")
+        private let email = SQLite.Expression<String>("email")
+        private let password = SQLite.Expression<String>("password")
+        private let isLoggedIn = SQLite.Expression<Bool>("isLoggedIn")
+        private let recipeName = SQLite.Expression<String>("name")
+        private let recipeDescription = SQLite.Expression<String>("description")
+        private let recipeFilters = SQLite.Expression<String>("filters")
+        private let recipeUsername = SQLite.Expression<String>("recipeUsername")
 
     private init() {
         do {
@@ -170,8 +170,8 @@ class DatabaseManager {
 
     func updatePassword(username: String, newPassword: String) {
         let users = Table("users")
-        let usernameColumn = Expression<String>("username")
-        let passwordColumn = Expression<String>("password")
+        let usernameColumn = SQLite.Expression<String>("username")
+        let passwordColumn = SQLite.Expression<String>("password")
         
         let hashedNewPassword = hashPassword(newPassword) // Secure the password
 
@@ -221,9 +221,9 @@ class DatabaseManager {
 
     func validateUser(username: String, password: String) -> Bool {
         let users = Table("users")
-        let usernameColumn = Expression<String>("username")
-        let passwordColumn = Expression<String>("password")
-        let isLoggedInColumn = Expression<Bool>("isLoggedIn")
+        let usernameColumn = SQLite.Expression<String>("username")
+        let passwordColumn = SQLite.Expression<String>("password")
+        let isLoggedInColumn = SQLite.Expression<Bool>("isLoggedIn")
 
         do {
             let query = users.filter(usernameColumn == username)

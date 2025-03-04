@@ -5,32 +5,34 @@ class RecipeDatabaseManager {
     static let shared = RecipeDatabaseManager()
     private var db: Connection?
 
-     let recipes = Table("recipes")
-     let id = Expression<Int64>("id")
-    private let username = Expression<String>("username")
-    private let name = Expression<String>("name")
-    private let description = Expression<String>("description")
-    private let time = Expression<Int>("time") // Add time as an integer (minutes)
+    // Use SQLite.Expression explicitly
+    let recipes = Table("recipes")
+    let id = SQLite.Expression<Int64>("id")
+    private let username = SQLite.Expression<String>("username")
+    private let name = SQLite.Expression<String>("name")
+    private let description = SQLite.Expression<String>("description")
+    private let time = SQLite.Expression<Int>("time") // Add time as an integer (minutes)
 
     var recipeTable: Table { return recipes }
-    var recipeIdExpression: Expression<Int64> { return id }
-    
+    var recipeIdExpression: SQLite.Expression<Int64> { return id }
+
     private let recipeFilters = Table("recipe_filters")
-    private let recipeId = Expression<Int64>("recipe_id")
-    private let filterIdRef = Expression<Int64>("filter_id")
-    
+    private let recipeId = SQLite.Expression<Int64>("recipe_id")
+    private let filterIdRef = SQLite.Expression<Int64>("filter_id")
+
     private let favorites = Table("favorites")
-    private let favoriteId = Expression<Int64>("id")
-    private let favoriteUser = Expression<String>("username")
-    private let favoriteRecipeId = Expression<Int64>("recipe_id")
+    private let favoriteId = SQLite.Expression<Int64>("id")
+    private let favoriteUser = SQLite.Expression<String>("username")
+    private let favoriteRecipeId = SQLite.Expression<Int64>("recipe_id")
 
     private init() {
         db = ConnectionManager.shared.getConnection() // Get connection from ConnectionManager
         //dropTables()  // Delete existing tables
         createRecipesTable()
-        createRecipeFiltersTable()  
+        createRecipeFiltersTable()
         createFavoritesTable()
     }
+
     private func dropTables() {
         do {
             try db?.run("DROP TABLE IF EXISTS recipes")
@@ -42,6 +44,7 @@ class RecipeDatabaseManager {
             print("Error dropping tables: \(error)")
         }
     }
+    
     // MARK: - Tables
 
     private func createRecipesTable() {
@@ -59,7 +62,6 @@ class RecipeDatabaseManager {
         }
     }
 
-    
     private func createFavoritesTable() {
         do {
             try db?.run(favorites.create(ifNotExists: true) { t in
@@ -73,7 +75,7 @@ class RecipeDatabaseManager {
             print("Error creating favorites table: \(error)")
         }
     }
-    
+
     private func createRecipeFiltersTable() {
         do {
             try db?.run(recipeFilters.create(ifNotExists: true) { t in
@@ -85,20 +87,23 @@ class RecipeDatabaseManager {
             print("Error creating recipe_filters table: \(error)")
         }
     }
-    
-
 
     // MARK: - Basic Recipe
 
-    func addRecipe(username: String, name: String, description: String, time: Int, selectedFilters: [String], ingredients: [(name: String, amount: String, measurement: String)]) -> Bool {
+    func addRecipe(username: String, name: String, description: String, time: Int, selectedFilters: [String], ingredients: [(name: String, amount: String, measurement: String)], instructions: [(stepNumber: Int, instructionText: String)]) -> Bool {
         do {
+            // Insert recipe into the database
             guard let recipeId = try db?.run(recipes.insert(self.username <- username, self.name <- name, self.description <- description, self.time <- time)) else {
                 print("Error: Failed to insert recipe.")
                 return false
             }
 
-            // Add ingredients
+            // Add ingredients to the recipe
             IngredientManager.shared.addIngredients(recipeId: recipeId, ingredientList: ingredients)
+
+            // ✅ Add instructions to the recipe using InstructionsManager
+            // Pass the instructions array with both stepNumber and instructionText
+            InstructionsManager.shared.addInstructions(recipeId: recipeId, instructionsList: instructions)
 
             // Insert relationships between recipe and filters
             for filter in selectedFilters {
@@ -113,7 +118,6 @@ class RecipeDatabaseManager {
             return false
         }
     }
-
 
 
     func fetchRecipesForUser(username: String, completion: @escaping ([(id: Int64, name: String, description: String, filters: [String])]) -> Void) {
@@ -146,18 +150,17 @@ class RecipeDatabaseManager {
         }
     }
 
-    
     func deleteRecipe(name: String) -> Bool {
-            do {
-                let recipeToDelete = recipes.filter(self.name == name)
-                try db?.run(recipeToDelete.delete())
-                return true
-            } catch {
-                print("Error deleting recipe: \(error)")
-                return false
-            }
+        do {
+            let recipeToDelete = recipes.filter(self.name == name)
+            try db?.run(recipeToDelete.delete())
+            return true
+        } catch {
+            print("Error deleting recipe: \(error)")
+            return false
         }
-    
+    }
+
     // MARK: - Favorites
     func addFavorite(username: String, recipeId: Int64) -> Bool {
         do {
@@ -169,6 +172,7 @@ class RecipeDatabaseManager {
             return false
         }
     }
+
     func removeFavorite(username: String, recipeId: Int64) -> Bool {
         do {
             let favoriteToDelete = favorites.filter(favoriteUser == username && favoriteRecipeId == recipeId)
@@ -180,6 +184,7 @@ class RecipeDatabaseManager {
             return false
         }
     }
+
     func getFavoritesForUser(username: String) -> [Int64] {
         var favoriteRecipes: [Int64] = []
         do {
@@ -191,6 +196,7 @@ class RecipeDatabaseManager {
         }
         return favoriteRecipes
     }
+
     func isRecipeFavorite(username: String, recipeId: Int64) -> Bool {
         do {
             let query = favorites.filter(favoriteUser == username && favoriteRecipeId == recipeId)
@@ -200,6 +206,7 @@ class RecipeDatabaseManager {
             return false
         }
     }
+
     func getRecipeIdByName(_ name: String) -> Int64? {
         do {
             let query = recipes.filter(self.name == name)
@@ -211,6 +218,6 @@ class RecipeDatabaseManager {
         }
         return nil
     }
+    
+    
 }
-
-

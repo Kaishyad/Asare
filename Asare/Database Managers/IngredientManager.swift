@@ -6,11 +6,11 @@ class IngredientManager {
     private var db: Connection?
 
     private let ingredients = Table("ingredients")
-    private let id = Expression<Int64>("id")
-    private let recipeId = Expression<Int64>("recipe_id")
-    private let name = Expression<String>("name")
-    private let amount = Expression<String>("amount")  // Added amount field
-    private let measurement = Expression<String>("measurement")
+    private let id = SQLite.Expression<Int64>("id")
+    private let recipeId = SQLite.Expression<Int64>("recipe_id")
+    private let name = SQLite.Expression<String>("name")
+    private let amount = SQLite.Expression<String>("amount")  // Added amount field
+    private let measurement = SQLite.Expression<String>("measurement")
 
     private init() {
         db = ConnectionManager.shared.getConnection()

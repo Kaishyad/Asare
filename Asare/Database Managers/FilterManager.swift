@@ -6,8 +6,8 @@ class FilterManager {
     private var db: Connection?
 
     private let filters = Table("filters")
-    private let filterId = Expression<Int64>("id")
-    private let filterName = Expression<String>("name")
+    private let filterId = SQLite.Expression<Int64>("id")
+    private let filterName = SQLite.Expression<String>("name")
     
     private let defaultFilters = ["Vegetarian", "Quick", "Spicy", "High-Protein", "Gluten-Free", "Vegan", "Dairy-Free", "Keto"]
 
@@ -64,11 +64,11 @@ class FilterManager {
         return filters
     }
 
-    func getFilterIdExpression() -> Expression<Int64> {
+    func getFilterIdExpression() -> SQLite.Expression<Int64> {
         return filterId
     }
 
-    func getFilterNameExpression() -> Expression<String> {
+    func getFilterNameExpression() -> SQLite.Expression<String> {
         return filterName
     }
 

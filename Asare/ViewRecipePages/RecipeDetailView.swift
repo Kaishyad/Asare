@@ -4,6 +4,7 @@ struct RecipeDetailView: View {
     var recipe: (id: Int64, name: String, description: String, filters: [String])
     @Environment(\.presentationMode) var presentationMode
     @State private var ingredients: [(name: String, amount: String, measurement: String)] = []
+    @State private var instructions: [(stepNumber: Int, instructionText: String)] = []
 
     var body: some View {
         ScrollView {
@@ -50,6 +51,25 @@ struct RecipeDetailView: View {
                         .padding(.top)
                 }
 
+                // Display instructions if available
+                if !instructions.isEmpty {
+                    Text("Instructions:")
+                        .font(.headline)
+                        .foregroundColor(.pink)
+                        .padding(.top)
+                    
+                    ForEach(instructions, id: \.stepNumber) { instruction in
+                        Text("Step \(instruction.stepNumber): \(instruction.instructionText)")
+                            .font(.body)
+                            .padding(.vertical, 5)
+                    }
+                } else {
+                    Text("No instructions available")
+                        .font(.body)
+                        .foregroundColor(.gray)
+                        .padding(.top)
+                }
+
                 Spacer()
             }
             .padding()
@@ -67,6 +87,7 @@ struct RecipeDetailView: View {
         }
         .onAppear {
             fetchIngredients()
+            fetchInstructions() // Fetch instructions when the view appears
         }
     }
 
@@ -83,5 +104,10 @@ struct RecipeDetailView: View {
     // Fetch ingredients for the recipe when the view appears
     private func fetchIngredients() {
         ingredients = IngredientManager.shared.fetchIngredientsForRecipe(recipeId: recipe.id)
+    }
+
+    // Fetch instructions for the recipe
+    private func fetchInstructions() {
+        instructions = InstructionsManager.shared.fetchInstructions(recipeId: recipe.id)
     }
 }

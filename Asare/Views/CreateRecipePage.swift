@@ -4,19 +4,23 @@ struct CreateRecipePage: View {
     @EnvironmentObject var settings: AppSettings
     @State private var recipeName: String = ""
     @State private var recipeDescription: String = ""
-    @State private var selectedFilters: Set<String> = [] // Selected filters are stored in a Set for uniqueness
-    @State private var customFilterName: String = "" // Custom filter input field
-    @State private var allFilters: [String] = [] // List of all available filters
+    @State private var selectedFilters: Set<String> = []
+    @State private var allFilters: [String] = []
     @State private var isSaving = false
     @State private var isFiltersExpanded: Bool = false
     @State private var currentUser: String = ""
-    @State private var showSuccessBanner: Bool = false // Variable to control the banner visibility
-    @State private var successMessage: String = "" // Success message to display
-    @State private var recipeTime: String = "" // Time input as a string
+    @State private var showSuccessBanner: Bool = false
+    @State private var successMessage: String = ""
+    @State private var recipeTime: String = ""
     @State private var isIngredientsExpanded = false
+    @State private var isInstructionsExpanded = false
+    @State private var recipeHours: Int = 0
+    @State private var recipeMinutes: Int = 0
+    @State private var isTimeExpanded: Bool = false  // Track whether time section is expanded or collapsed
 
     // Ingredients state variables
     @State private var ingredients: [(name: String, amount: String, measurement: String)] = []
+    @State private var instructions: [(stepNumber: Int, instructionText: String)] = []
 
     var body: some View {
         NavigationView {
@@ -33,12 +37,6 @@ struct CreateRecipePage: View {
                         .animation(.easeInOut, value: showSuccessBanner)
                 }
 
-                Text("Create New Recipe")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.black)
-                    .padding(.horizontal)
-
                 TextField("Enter Recipe Name", text: $recipeName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .font(settings.font)
@@ -51,22 +49,99 @@ struct CreateRecipePage: View {
 
                 // Ingredients Section
                 VStack(alignment: .leading) {
-                    NavigationLink(destination: AddIngredientsView(ingredients: $ingredients)) {
-                        Text("Add Ingredients")
-                            .font(.body)
-                            .foregroundColor(.blue)
-                            .padding()
-                            .background(Color.pink.opacity(0.1))
-                            .cornerRadius(10)
+                    Button(action: { isIngredientsExpanded.toggle() }) {
+                        HStack {
+                            Text("Ingredients")
+                                .font(settings.font)
+                                .foregroundColor(.pink)
+                                .fontWeight(.bold)
+                            Spacer()
+                            Image(systemName: isIngredientsExpanded ? "chevron.up" : "chevron.down")
+                                .foregroundColor(.pink)
+                        }
+                        .padding(.top)
                     }
 
-                    // Display list of added ingredients
-                    List(ingredients, id: \.name) { ingredient in
-                        Text("\(ingredient.amount) \(ingredient.measurement) of \(ingredient.name)")
+                    if isIngredientsExpanded {
+                        VStack(alignment: .leading) {
+                            // Add Ingredient button
+                            NavigationLink(destination: AddIngredientsView(ingredients: $ingredients)) {
+                                Text("Add Ingredient")
+                                    .font(settings.font)
+                                    .foregroundColor(.blue)
+                                    .padding()
+                                    .background(Color.pink.opacity(0.1))
+                                    .cornerRadius(10)
+                                    .padding(.bottom, 5)
+                            }
+
+                            // Display list of added ingredients
+                            if ingredients.isEmpty {
+                                Text("No ingredients added yet.")
+                                    .foregroundColor(.gray)
+                                    .padding(.top)
+                            } else {
+                                List(ingredients, id: \.name) { ingredient in
+                                    Text("\(ingredient.amount) \(ingredient.measurement) of \(ingredient.name)")
+                                }
+                                .frame(maxHeight: 150)
+                            }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
                     }
                 }
 
-                // Filters Section
+                //MARK: - Instructions Section
+                VStack(alignment: .leading) {
+                    Button(action: { isInstructionsExpanded.toggle() }) {
+                        HStack {
+                            Text("Instructions")
+                                .font(settings.font)
+                                .foregroundColor(.pink)
+                                .fontWeight(.bold)
+                            Spacer()
+                            Image(systemName: isInstructionsExpanded ? "chevron.up" : "chevron.down")
+                                .foregroundColor(.pink)
+                        }
+                        .padding(.top)
+                    }
+
+                    if isInstructionsExpanded {
+                        VStack(alignment: .leading) {
+                            // Add Instruction button
+                            NavigationLink(destination: AddInstructionsView(instructions: $instructions)) {
+                                Text("Add Instruction")
+                                    .font(settings.font)
+                                    .foregroundColor(.blue)
+                                    .padding()
+                                    .background(Color.pink.opacity(0.1))
+                                    .cornerRadius(10)
+                                    .padding(.bottom, 5)
+                            }
+
+                            // Display list of added instructions
+                            if instructions.isEmpty {
+                                Text("No instructions added yet.")
+                                    .foregroundColor(.gray)
+                                    .padding(.top)
+                            } else {
+                                List(instructions, id: \.stepNumber) { instruction in
+                                    Text("Step \(instruction.stepNumber): \(instruction.instructionText)")
+                                }
+                                .frame(maxHeight: 150)
+                            }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
+                    }
+                }
+
+                //MARK: - Filters Section
                 VStack(alignment: .leading) {
                     Button(action: { isFiltersExpanded.toggle() }) {
                         HStack {
@@ -108,26 +183,55 @@ struct CreateRecipePage: View {
                     }
                 }
 
-                VStack {
-                    TextField("Enter Time (in minutes)", text: $recipeTime)
-                        .keyboardType(.numberPad)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .font(settings.font)
+                // MARK: - Time picker section
+                VStack(alignment: .leading) {
+                    Button(action: { isTimeExpanded.toggle() }) {
+                        HStack {
+                            Text("Time")
+                                .font(settings.font)
+                                .foregroundColor(.pink)
+                            Spacer()
+                            Text("\(recipeHours) hr \(recipeMinutes) min") // Show time if selected
+                                .font(settings.font)
+                                .foregroundColor(.pink)
+                            Image(systemName: isTimeExpanded ? "chevron.up" : "chevron.down")
+                                .foregroundColor(.pink)
+                        }
+                        .padding(.top)
+                    }
+
+                    if isTimeExpanded {
+                        HStack {
+                            VStack {
+                                Text("Hours")
+                                    .font(.subheadline)
+                                Picker("Hours", selection: $recipeHours) {
+                                    ForEach(0..<24, id: \.self) { hour in
+                                        Text("\(hour) hr").tag(hour)
+                                    }
+                                }
+                                .pickerStyle(WheelPickerStyle())
+                                .frame(maxWidth: .infinity)
+                            }
+
+                            VStack {
+                                Text("Minutes")
+                                    .font(.subheadline)
+                                Picker("Minutes", selection: $recipeMinutes) {
+                                    ForEach(0..<60, id: \.self) { minute in
+                                        Text("\(minute) min").tag(minute)
+                                    }
+                                }
+                                .pickerStyle(WheelPickerStyle())
+                                .frame(maxWidth: .infinity)
+                            }
+                        }
                         .padding()
 
-                    Button(action: saveRecipe) {
-                        Text(isSaving ? "Saving..." : "Save Recipe")
-                            .font(settings.font)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.pink)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
                     }
-                    .disabled(isSaving || recipeName.isEmpty || recipeDescription.isEmpty || recipeTime.isEmpty || ingredients.isEmpty) // Disable if any field is empty
-
-                    Spacer()
                 }
+
+
             }
             .navigationTitle("New Recipe")
             .padding()
@@ -139,59 +243,61 @@ struct CreateRecipePage: View {
             }
         }
     }
-
-    // Save the recipe with the selected filters and ingredients
+    
+//MARK: - Save recipe
     private func saveRecipe() {
-        guard !currentUser.isEmpty else {
-            print("No user logged in")
-            return
-        }
-
-        // Ensure the recipe time is a valid integer
-        guard let time = Int(recipeTime), time > 0 else {
-            print("Invalid time input")
-            return
-        }
-
-        isSaving = true
-
-        let success = RecipeDatabaseManager.shared.addRecipe(
-            username: currentUser,
-            name: recipeName,
-            description: recipeDescription,
-            time: time, // Pass the time value
-            selectedFilters: Array(selectedFilters), // Convert Set to Array for saving
-            ingredients: ingredients // Pass the ingredients list with amount
-        )
-
-        if success {
-            showSuccessBanner = true
-            successMessage = "Recipe saved successfully!"
-            
-            // Hide banner after 3 seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                showSuccessBanner = false
+            guard !currentUser.isEmpty else {
+                print("No user logged in")
+                return
             }
 
-            // Reset form fields
-            recipeName = ""
-            recipeDescription = ""
-            selectedFilters.removeAll()
-            recipeTime = "" // Reset the time field
-            ingredients.removeAll() // Clear the ingredients list
-        } else {
-            print("Failed to save recipe")
+            let totalMinutes = (recipeHours * 60) + recipeMinutes
+
+            guard totalMinutes > 0 else {
+                print("Invalid time input")
+                return
+            }
+
+            isSaving = true
+
+            let success = RecipeDatabaseManager.shared.addRecipe(
+                username: currentUser,
+                name: recipeName,
+                description: recipeDescription,
+                time: totalMinutes, // store the combined minutes here
+                selectedFilters: Array(selectedFilters),
+                ingredients: ingredients,
+                instructions: instructions
+            )
+
+            if success {
+                showSuccessBanner = true
+                successMessage = "Recipe saved successfully!"
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    showSuccessBanner = false
+                }
+
+                // Reset form fields
+                recipeName = ""
+                recipeDescription = ""
+                selectedFilters.removeAll()
+                recipeHours = 0
+                recipeMinutes = 0
+                ingredients.removeAll()
+                instructions.removeAll()
+            } else {
+                print("Failed to save recipe")
+            }
+
+            isSaving = false
         }
 
-        isSaving = false
-    }
 
-    // Load all available filters
     private func loadFilters() {
         allFilters = FilterManager.shared.getAllFilters()
     }
 
-    // Toggle the selection of a filter
     private func toggleFilter(_ filter: String) {
         if selectedFilters.contains(filter) {
             selectedFilters.remove(filter)
@@ -200,7 +306,6 @@ struct CreateRecipePage: View {
         }
     }
 
-    // Delete a selected filter
     private func deleteFilter(_ filter: String) {
         let success = FilterManager.shared.deleteFilter(name: filter)
         if success {
