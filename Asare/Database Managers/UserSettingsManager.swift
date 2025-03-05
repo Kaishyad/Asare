@@ -1,5 +1,6 @@
- import SQLite
+import SQLite
 import Foundation
+
 class UserSettingsManager {
     static let shared = UserSettingsManager()
     private var db: Connection?
@@ -21,6 +22,7 @@ class UserSettingsManager {
             print("UserSettings Database path: \(path)")
 
             db = try Connection(path)
+            dropUserSettingsTable()
             createUserSettingsTable()
         } catch {
             print("Error initializing database: \(error)")
@@ -42,13 +44,22 @@ class UserSettingsManager {
         }
     }
 
-    // Save user settings to the database, ensuring they are linked by username
+    // MARK: - Drop Table Function
+    func dropUserSettingsTable() {
+        do {
+            try db?.run(userSettings.drop(ifExists: true))
+            print("UserSettings table dropped successfully!")
+        } catch {
+            print("Error dropping UserSettings table: \(error)")
+        }
+    }
+
+    // Save user settings to the database
     func saveUserSettings(username: String, darkMode: Bool, fontSize: Double, useDyslexiaFont: Bool, measurementUnit: String) {
         do {
             let userSettingsQuery = userSettings.filter(self.username == username)
             
             if try db?.pluck(userSettingsQuery) != nil {
-                // Update if the settings already exist for this user
                 try db?.run(userSettingsQuery.update(
                     self.darkMode <- darkMode,
                     self.fontSize <- fontSize,
@@ -56,7 +67,6 @@ class UserSettingsManager {
                     self.measurementUnit <- measurementUnit
                 ))
             } else {
-                // Insert new settings for this user if they don't exist
                 try db?.run(userSettings.insert(
                     self.username <- username,
                     self.darkMode <- darkMode,
@@ -70,7 +80,7 @@ class UserSettingsManager {
         }
     }
 
-    // Fetch the settings for the specific user by username
+    // Fetch the settings for a specific user
     func getUserSettings(username: String) -> (darkMode: Bool, fontSize: Double, useDyslexiaFont: Bool, measurementUnit: String)? {
         do {
             let userSettingsQuery = userSettings.filter(self.username == username)

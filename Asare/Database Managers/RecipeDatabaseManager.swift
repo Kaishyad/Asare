@@ -12,6 +12,7 @@ class RecipeDatabaseManager {
     private let name = SQLite.Expression<String>("name")
     private let description = SQLite.Expression<String>("description")
     private let time = SQLite.Expression<Int>("time") // Add time as an integer (minutes)
+    private let videoURL = SQLite.Expression<String?>("video_url") // Optional YouTube/website URL
 
     var recipeTable: Table { return recipes }
     var recipeIdExpression: SQLite.Expression<Int64> { return id }
@@ -25,12 +26,19 @@ class RecipeDatabaseManager {
     private let favoriteUser = SQLite.Expression<String>("username")
     private let favoriteRecipeId = SQLite.Expression<Int64>("recipe_id")
 
+    private let coverImage = SQLite.Expression<String?>("cover_image") // Optional image path
+    
+    private let recipeImages = Table("recipe_images")
+    private let imageId = SQLite.Expression<Int64>("id")
+    private let imagePath = SQLite.Expression<String>("image_path") // Image path
+
     private init() {
         db = ConnectionManager.shared.getConnection() // Get connection from ConnectionManager
         //dropTables()  // Delete existing tables
         createRecipesTable()
         createRecipeFiltersTable()
         createFavoritesTable()
+        createRecipeImagesTable()
     }
 
     private func dropTables() {
@@ -54,7 +62,9 @@ class RecipeDatabaseManager {
                 t.column(username)
                 t.column(name)
                 t.column(description)
-                t.column(time) // Add the time column
+                t.column(time)
+                t.column(coverImage)
+                t.column(videoURL) 
             })
             print("Recipes table created successfully!")
         } catch {
@@ -87,25 +97,46 @@ class RecipeDatabaseManager {
             print("Error creating recipe_filters table: \(error)")
         }
     }
+    
+    private func createRecipeImagesTable() {
+        do {
+            try db?.run(recipeImages.create(ifNotExists: true) { t in
+                t.column(imageId, primaryKey: true)
+                t.column(recipeId, references: recipes, id) // Link to recipes table
+                t.column(imagePath) // Store image path
+            })
+            print("RecipeImages table created successfully!")
+        } catch {
+            print("Error creating recipe_images table: \(error)")
+        }
+    }
 
     // MARK: - Basic Recipe
 
-    func addRecipe(username: String, name: String, description: String, time: Int, selectedFilters: [String], ingredients: [(name: String, amount: String, measurement: String)], instructions: [(stepNumber: Int, instructionText: String)]) -> Bool {
+    func addRecipe(username: String, name: String, description: String, time: Int, selectedFilters: [String], ingredients: [(name: String, amount: String, measurement: String)], instructions: [(stepNumber: Int, instructionText: String)], coverImagePath: String?, otherImages: [String], videoURL: String?) -> Bool {
         do {
-            // Insert recipe into the database
-            guard let recipeId = try db?.run(recipes.insert(self.username <- username, self.name <- name, self.description <- description, self.time <- time)) else {
+            guard let recipeId = try db?.run(recipes.insert(
+                self.username <- username,
+                self.name <- name,
+                self.description <- description,
+                self.time <- time,
+                self.coverImage <- coverImagePath,
+                self.videoURL <- videoURL // Store video URL
+            )) else {
                 print("Error: Failed to insert recipe.")
                 return false
             }
 
-            // Add ingredients to the recipe
-            IngredientManager.shared.addIngredients(recipeId: recipeId, ingredientList: ingredients)
+            // Add multiple images
+            for imagePath in otherImages {
+                try db?.run(recipeImages.insert(self.recipeId <- recipeId, self.imagePath <- imagePath))
+            }
 
-            // ✅ Add instructions to the recipe using InstructionsManager
-            // Pass the instructions array with both stepNumber and instructionText
+            // Add ingredients & instructions
+            IngredientManager.shared.addIngredients(recipeId: recipeId, ingredientList: ingredients)
             InstructionsManager.shared.addInstructions(recipeId: recipeId, instructionsList: instructions)
 
-            // Insert relationships between recipe and filters
+            // Add filters
             for filter in selectedFilters {
                 if let filterIdValue = FilterManager.shared.getFilterIdByName(filter) {
                     try db?.run(recipeFilters.insert(self.recipeId <- recipeId, self.filterIdRef <- filterIdValue))
@@ -120,10 +151,11 @@ class RecipeDatabaseManager {
     }
 
 
-    func fetchRecipesForUser(username: String, completion: @escaping ([(id: Int64, name: String, description: String, filters: [String])]) -> Void) {
+
+    func fetchRecipesForUser(username: String, completion: @escaping ([(id: Int64, name: String, description: String, time: Int, filters: [String])]) -> Void) {
         do {
             let query = recipes.filter(self.username == username)
-            var fetchedRecipes: [(id: Int64, name: String, description: String, filters: [String])] = []
+            var fetchedRecipes: [(id: Int64, name: String, description: String, time: Int, filters: [String])] = []
 
             let allRecipes = try db?.prepare(query)
 
@@ -131,16 +163,20 @@ class RecipeDatabaseManager {
                 let recipeId = recipe[self.id]
                 let recipeName = recipe[self.name]
                 let recipeDescription = recipe[self.description]
+                let recipeTime = recipe[self.time] // Fetching time (in minutes)
 
-                let filtersQuery = recipeFilters.filter(self.recipeId == recipe[self.id])
-                    .join(FilterManager.shared.getFiltersTable(), on: FilterManager.shared.getFiltersTable()[FilterManager.shared.getFilterIdExpression()] == recipeFilters[self.filterIdRef])
+                let filtersQuery = recipeFilters
+                    .filter(self.recipeId == recipe[self.id])
+                    .join(FilterManager.shared.getFiltersTable(), on:
+                        FilterManager.shared.getFiltersTable()[FilterManager.shared.getFilterIdExpression()] == recipeFilters[self.filterIdRef]
+                    )
 
                 var recipeFiltersList: [String] = []
                 for filter in try db!.prepare(filtersQuery) {
                     recipeFiltersList.append(filter[FilterManager.shared.getFilterNameExpression()])
                 }
 
-                fetchedRecipes.append((id: recipeId, name: recipeName, description: recipeDescription, filters: recipeFiltersList))
+                fetchedRecipes.append((id: recipeId, name: recipeName, description: recipeDescription, time: recipeTime, filters: recipeFiltersList))
             }
 
             completion(fetchedRecipes)
@@ -149,6 +185,20 @@ class RecipeDatabaseManager {
             completion([])
         }
     }
+    
+    func fetchOtherImages(recipeId: Int64) -> [String] {
+        var images: [String] = []
+        do {
+            let query = recipeImages.filter(self.recipeId == recipeId)
+            for row in try db!.prepare(query) {
+                images.append(row[self.imagePath])
+            }
+        } catch {
+            print("Error fetching images: \(error)")
+        }
+        return images
+    }
+
 
     func deleteRecipe(name: String) -> Bool {
         do {

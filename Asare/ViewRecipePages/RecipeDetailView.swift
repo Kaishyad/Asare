@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RecipeDetailView: View {
-    var recipe: (id: Int64, name: String, description: String, filters: [String])
+    var recipe: (id: Int64, name: String, description: String, time: Int, filters: [String])
     @Environment(\.presentationMode) var presentationMode
     @State private var ingredients: [(name: String, amount: String, measurement: String)] = []
     @State private var instructions: [(stepNumber: Int, instructionText: String)] = []

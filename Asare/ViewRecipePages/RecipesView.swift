@@ -8,9 +8,9 @@ struct RecipesView: View {
 
     let allFilters = FilterManager.shared.getAllFilters()
     @State private var selectedFilters: [String] = [] // Tracks user-selected filters
-    @State private var recipes: [(id: Int64, name: String, description: String, filters: [String])] = []
+    @State private var recipes: [(id: Int64, name: String, description: String, time: Int, filters: [String])] = []
 
-    var filteredRecipes: [(id: Int64, name: String, description: String, filters: [String])] {
+    var filteredRecipes: [(id: Int64, name: String, description: String, time: Int, filters: [String])] {
         recipes.filter { recipe in
             let matchesSearch = searchText.isEmpty ||
                 recipe.name.localizedCaseInsensitiveContains(searchText) ||
@@ -89,6 +89,10 @@ struct RecipesView: View {
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
                                         .lineLimit(2)
+                                    
+                                    Text(formatTime(minutes: recipe.time))
+                                        .font(.subheadline)
+                                        .foregroundColor(.pink)
 
                                     if !recipe.filters.isEmpty {
                                         Text(" \(recipe.filters.joined(separator: ", "))")
@@ -133,7 +137,9 @@ struct RecipesView: View {
                                     Text(recipe.description)
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
-
+                                    Text(formatTime(minutes: recipe.time))
+                                        .font(.subheadline)
+                                        .foregroundColor(.pink)
                                     if !recipe.filters.isEmpty {
                                         Text("\(recipe.filters.joined(separator: ", "))")
                                             .font(.subheadline)
@@ -151,6 +157,16 @@ struct RecipesView: View {
             .onAppear {
                 fetchRecipes()
             }
+        }
+    }
+    // Helper function to format time
+    private func formatTime(minutes: Int) -> String {
+        let hours = minutes / 60
+        let mins = minutes % 60
+        if hours > 0 {
+            return mins > 0 ? "\(hours) hr \(mins) min" : "\(hours) hr"
+        } else {
+            return "\(mins) min"
         }
     }
 
