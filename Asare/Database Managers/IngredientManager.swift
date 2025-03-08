@@ -11,11 +11,18 @@ class IngredientManager {
     private let name = SQLite.Expression<String>("name")
     private let amount = SQLite.Expression<String>("amount")  // Added amount field
     private let measurement = SQLite.Expression<String>("measurement")
+    private let section = SQLite.Expression<String>("section")
 
     private init() {
         db = ConnectionManager.shared.getConnection()
+        guard db != nil else {
+            print("Database connection failed!")
+            return
+        }
+        //dropIngredientsTable()
         createIngredientsTable()
     }
+
 
     private func createIngredientsTable() {
         do {
@@ -23,21 +30,30 @@ class IngredientManager {
                 t.column(id, primaryKey: true)
                 t.column(recipeId, references: RecipeDatabaseManager.shared.recipes, RecipeDatabaseManager.shared.id)
                 t.column(name)
-                t.column(amount)  // Include amount in the table
+                t.column(amount)
                 t.column(measurement)
+                t.column(section)
             })
             print("Ingredients table created successfully!")
         } catch {
             print("Error creating ingredients table: \(error)")
         }
     }
+    func dropIngredientsTable() {
+        do {
+            try db?.run(ingredients.drop(ifExists: true)) 
+            print("Ingredients table dropped successfully!")
+        } catch {
+            print("Error dropping ingredients table: \(error.localizedDescription)")
+        }
+    }
 
     // MARK: - Ingredient Management
 
-    func addIngredients(recipeId: Int64, ingredientList: [(name: String, amount: String, measurement: String)]) {
+    func addIngredients(recipeId: Int64, ingredientList: [(name: String, amount: String, measurement: String, section: String)]) {
         do {
             for ingredient in ingredientList {
-                try db?.run(ingredients.insert(self.recipeId <- recipeId, self.name <- ingredient.name, self.amount <- ingredient.amount, self.measurement <- ingredient.measurement))
+                try db?.run(ingredients.insert(self.recipeId <- recipeId, self.name <- ingredient.name, self.amount <- ingredient.amount, self.measurement <- ingredient.measurement, self.section <- ingredient.section))
             }
             print("Ingredients added successfully!")
         } catch {
@@ -45,18 +61,40 @@ class IngredientManager {
         }
     }
 
-    func fetchIngredientsForRecipe(recipeId: Int64) -> [(name: String, amount: String, measurement: String)] {
-        var ingredientList: [(name: String, amount: String, measurement: String)] = []
+    func fetchIngredientsForRecipe(recipeId: Int64) -> [(name: String, amount: String, measurement: String, section: String)] {
+        var ingredientList: [(name: String, amount: String, measurement: String, section: String)] = []
         do {
             for ingredient in try db!.prepare(ingredients.filter(self.recipeId == recipeId)) {
                 let name = ingredient[self.name]
-                let amount = ingredient[self.amount] // Fetch amount
+                let amount = ingredient[self.amount]
                 let measurement = ingredient[self.measurement]
-                ingredientList.append((name, amount, measurement))
+                let section = ingredient[self.section]
+                ingredientList.append((name, amount, measurement, section))
             }
         } catch {
             print("Error fetching ingredients: \(error)")
         }
         return ingredientList
     }
+    func fetchIngredientsGroupedBySection(recipeId: Int64) -> [String: [(name: String, amount: String, measurement: String)]] {
+        var groupedIngredients: [String: [(name: String, amount: String, measurement: String)]] = [:]
+        
+        do {
+            let query = ingredients.filter(self.recipeId == recipeId)
+            for row in try db!.prepare(query) {
+                let section = row[self.section]
+                let ingredient = (name: row[self.name], amount: row[self.amount], measurement: row[self.measurement])
+
+                if groupedIngredients[section] == nil {
+                    groupedIngredients[section] = []
+                }
+                groupedIngredients[section]?.append(ingredient)
+            }
+        } catch {
+            print("Error fetching ingredients grouped by section: \(error)")
+        }
+        
+        return groupedIngredients
+    }
+
 }

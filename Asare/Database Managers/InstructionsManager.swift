@@ -13,6 +13,7 @@ class InstructionsManager {
 
     private init() {
         db = ConnectionManager.shared.getConnection()
+        //dropInstructionsTable()
         createInstructionsTable()
     }
 
@@ -28,7 +29,14 @@ class InstructionsManager {
             print("Error creating instructions table: \(error)")
         }
     }
-
+    func dropInstructionsTable() {
+        do {
+            try db?.run(instructions.drop(ifExists: true)) 
+            print("Ingredients table dropped successfully!")
+        } catch {
+            print("Error dropping ingredients table: \(error.localizedDescription)")
+        }
+    }
     func addInstructions(recipeId: Int64, instructionsList: [(stepNumber: Int, instructionText: String)]) {
         do {
             var stepCounter = instructionsList.count + 1

@@ -3,7 +3,7 @@ import SwiftUI
 struct SettingsPage: View {
     @EnvironmentObject var settings: AppSettings
     @State private var currentUser: (username: String, email: String)?
-    @State private var isSaving = false // to show when the settings are being saved
+    @State private var isSaving = false
 
     private let settingsManager = UserSettingsManager.shared
 
@@ -15,6 +15,7 @@ struct SettingsPage: View {
                 settings.fontSize = userSettings.fontSize
                 settings.useDyslexiaFont = userSettings.useDyslexiaFont
                 settings.measurementUnit = userSettings.measurementUnit
+                settings.isGridView = userSettings.isGridView // Load Grid/List preference
             }
         }
     }
@@ -24,17 +25,17 @@ struct SettingsPage: View {
         
         isSaving = true
         
-        //Simulate saving delay for better UI feedback
         DispatchQueue.global(qos: .background).async {
             settingsManager.saveUserSettings(
                 username: username,
                 darkMode: settings.isDarkMode,
                 fontSize: settings.fontSize,
                 useDyslexiaFont: settings.useDyslexiaFont,
-                measurementUnit: settings.measurementUnit
+                measurementUnit: settings.measurementUnit,
+                isGridView: settings.isGridView
             )
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { //Delay UI update
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 isSaving = false
             }
         }
@@ -63,15 +64,19 @@ struct SettingsPage: View {
 
             Section(header: Text("Preferences").font(settings.font)) {
                 Picker("Measurement Unit", selection: $settings.measurementUnit) {
-                    Text("Metric (kg, ml)").tag("Metric")
-                    Text("Imperial (lbs, oz)").tag("Imperial")
+                    Text("Metric (kg, ml)").tag(0)
+                    Text("Imperial (lbs, oz)").tag(1)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .font(settings.font)
                 .accessibilityLabel("Measurement Unit Selection")
+
+                Toggle("Use Grid View", isOn: $settings.isGridView)
+                    .font(settings.font)
+                    .tint(.pink)
+                    .accessibilityLabel("Toggle Grid/List View")
             }
 
-            //Add Save Button
             Section {
                 Button(action: saveUserSettings) {
                     HStack {
@@ -83,10 +88,10 @@ struct SettingsPage: View {
                         }
                     }
                 }
-                .disabled(isSaving) //Disable the button while saving
+                .disabled(isSaving) 
             }
         }
         .navigationTitle("Settings")
-        .onAppear(perform: loadUserSettings) //Load user settings when the page appears
+        .onAppear(perform: loadUserSettings)
     }
 }

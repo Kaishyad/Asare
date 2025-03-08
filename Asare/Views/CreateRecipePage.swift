@@ -13,6 +13,7 @@ struct CreateRecipePage: View {
     @State private var customFilterName: String = ""
 
     @State private var currentUser: String = ""
+    
     @State private var showSuccessBanner: Bool = false
     @State private var successMessage: String = ""
     
@@ -32,399 +33,308 @@ struct CreateRecipePage: View {
     @State private var otherImages: [String] = []
     @State private var selectedImageItems: [PhotosPickerItem] = []
 
-    @State private var ingredients: [(name: String, amount: String, measurement: String)] = []
+    @State private var ingredients: [(name: String, amount: String, measurement: String, section: String)] = []
     @State private var instructions: [(stepNumber: Int, instructionText: String)] = []
     
-    @State private var videoURL: String = ""
+    @State private var videoURL: String? = nil
     @State private var isURLSectionExpanded = false
-
+    
+    @State private var isFavorite: Bool = false
 
     var body: some View {
-        NavigationView {
-            VStack {
-                // Success Banner
-                if showSuccessBanner {
-                    Text(successMessage)
-                        .font(settings.font)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .transition(.move(edge: .top))
-                        .animation(.easeInOut, value: showSuccessBanner)
-                }
-                
-                TextField("Enter Recipe Name", text: $recipeName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .font(settings.font)
-                    .padding()
-                
-                TextField("Enter Recipe Description", text: $recipeDescription)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .font(settings.font)
-                    .padding()
-                
-                Section {
-                    DisclosureGroup("Add YouTube/Website URL", isExpanded: $isURLSectionExpanded) {
-                        TextField("Enter URL", text: $videoURL)
-                            .textInputAutocapitalization(.none)
-                            .keyboardType(.URL)
-                            .padding()
-                    }
-                
-
-                }
-
-                
-                // Ingredients Section
-                VStack(alignment: .leading) {
-                    Button(action: { isIngredientsExpanded.toggle() }) {
-                        HStack {
-                            Text("Ingredients")
-                                .font(settings.font)
-                                .foregroundColor(.pink)
-                                .fontWeight(.bold)
-                            Spacer()
-                            Image(systemName: isIngredientsExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(.pink)
-                        }
-                        .padding(.top)
-                    }
-                    
-                    if isIngredientsExpanded {
-                        VStack(alignment: .leading) {
-                            // Add Ingredient button
-                            NavigationLink(destination: AddIngredientsView(ingredients: $ingredients)) {
-                                Text("Add Ingredient")
-                                    .font(settings.font)
-                                    .foregroundColor(.blue)
-                                    .padding()
-                                    .background(Color.pink.opacity(0.1))
-                                    .cornerRadius(10)
-                                    .padding(.bottom, 5)
-                            }
-                            
-                            // Display list of added ingredients
-                            if ingredients.isEmpty {
-                                Text("No ingredients added yet.")
-                                    .foregroundColor(.gray)
-                                    .padding(.top)
-                            } else {
-                                List(ingredients, id: \.name) { ingredient in
-                                    Text("\(ingredient.amount) \(ingredient.measurement) of \(ingredient.name)")
-                                }
-                                .frame(maxHeight: 150)
-                            }
-                        }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 5)
-                    }
-                }
-                
-                //MARK: - Instructions Section
-                VStack(alignment: .leading) {
-                    Button(action: { isInstructionsExpanded.toggle() }) {
-                        HStack {
-                            Text("Instructions")
-                                .font(settings.font)
-                                .foregroundColor(.pink)
-                                .fontWeight(.bold)
-                            Spacer()
-                            Image(systemName: isInstructionsExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(.pink)
-                        }
-                        .padding(.top)
-                    }
-                    
-                    if isInstructionsExpanded {
-                        VStack(alignment: .leading) {
-                            // Add Instruction button
-                            NavigationLink(destination: AddInstructionsView(instructions: $instructions)) {
-                                Text("Add Instruction")
-                                    .font(settings.font)
-                                    .foregroundColor(.blue)
-                                    .padding()
-                                    .background(Color.pink.opacity(0.1))
-                                    .cornerRadius(10)
-                                    .padding(.bottom, 5)
-                            }
-                            
-                            // Display list of added instructions
-                            if instructions.isEmpty {
-                                Text("No instructions added yet.")
-                                    .foregroundColor(.gray)
-                                    .padding(.top)
-                            } else {
-                                List(instructions, id: \.stepNumber) { instruction in
-                                    Text("Step \(instruction.stepNumber): \(instruction.instructionText)")
-                                }
-                                .frame(maxHeight: 150)
-                            }
-                        }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 5)
-                    }
-                }
-                
-
-
-                
-                //MARK: - Filters Section
-                VStack(alignment: .leading) {
-                    Button(action: { isFiltersExpanded.toggle() }) {
-                        HStack {
-                            Text("Filters: \(selectedFilters.isEmpty ? "None" : selectedFilters.joined(separator: ", "))")
-                                .font(settings.font)
-                                .foregroundColor(.pink)
-                                .fontWeight(.bold)
-                            Spacer()
-                            Image(systemName: isFiltersExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(.pink)
-                        }
-                        .padding(.top)
-                    }
-                    
-                    if isFiltersExpanded {
-                        ScrollView {
-                            VStack(alignment: .leading) {
-                                // Existing filters display
-                                ForEach(allFilters, id: \.self) { filter in
-                                    HStack {
-                                        Button(action: { toggleFilter(filter) }) {
-                                            Image(systemName: selectedFilters.contains(filter) ? "checkmark.circle.fill" : "circle")
-                                                .foregroundColor(selectedFilters.contains(filter) ? .pink : .gray)
-                                        }
-                                        .padding(.trailing, 5)
-                                        
-                                        Text(filter)
-                                        
-                                        Spacer()
-                                        
-                                        Button(action: { deleteFilter(filter) }) {
-                                            Image(systemName: "trash")
-                                                .foregroundColor(.red)
-                                        }
-                                    }
-                                    .padding(.vertical, 5)
-                                }
-                                
-                                // Custom filter input
-                                HStack {
-                                    TextField("Enter custom filter", text: $customFilterName)
-                                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                                        .padding(.top)
-                                    
-                                    Button(action: addCustomFilter) {
-                                        Text("Add")
-                                            .font(settings.font)
-                                            .padding()
-                                            .background(Color.pink)
-                                            .foregroundColor(.white)
-                                            .cornerRadius(10)
-                                    }
-                                    .padding(.leading)
-                                    .disabled(customFilterName.isEmpty || selectedFilters.contains(customFilterName) || allFilters.contains(customFilterName)) // Disable if invalid
-                                }
-                                .padding(.top)
-                            }
-                        }
-                        .frame(maxHeight: 200)
-                    }
-                }
-            
-                
-                //MARK: - Cover Image Section
-                VStack(alignment: .leading) {
-                    // Header
-                    Button(action: { isCoverImageExpanded.toggle() }) {
-                        HStack {
-                            Text("Cover Image")
-                                .font(settings.font)
-                                .foregroundColor(.pink)
-                                .fontWeight(.bold)
-                            Spacer()
-                            Image(systemName: isCoverImageExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(.pink)
-                        }
-                        .padding(.top)
-                    }
-
-                    // Expanded Section
-                    if isCoverImageExpanded {
-                        VStack {
-                            // Show selected image or placeholder
-                            if let coverImage {
-                                Image(uiImage: coverImage)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 200)
-                                    .cornerRadius(10)
-                            } else {
-                                Text("Select a Cover Image")
-                                    .foregroundColor(.gray)
-                            }
-
-                            // Select Image Button
-                            PhotosPicker(selection: $selectedImageItem, matching: .images) {
-                                Text("Choose Image")
-                                    .padding()
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                            }
-                            .onChange(of: selectedImageItem) { newItem in
-                                loadImage(from: newItem)
-                            }
-                        }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 5)
-                    }
-                }
-
-
-                // MARK: - Time picker section
-                VStack(alignment: .leading) {
-                    Button(action: { isTimeExpanded.toggle() }) {
-                        HStack {
-                            Text("Time")
-                                .font(settings.font)
-                                .foregroundColor(.pink)
-                            Spacer()
-                            Text("\(recipeHours) hr \(recipeMinutes) min")
-                                .font(settings.font)
-                                .foregroundColor(.pink)
-                            Image(systemName: isTimeExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(.pink)
-                        }
-                        .padding(.top)
-                    }
-
-                    if isTimeExpanded {
-                        HStack {
-                            VStack {
-                                Text("Hours")
-                                    .font(.subheadline)
-                                Picker("Hours", selection: $recipeHours) {
-                                    ForEach(0..<24, id: \.self) { hour in
-                                        Text("\(hour) hr").tag(hour)
-                                    }
-                                }
-                                .pickerStyle(WheelPickerStyle())
-                                .frame(maxWidth: .infinity)
-                            }
-
-                            VStack {
-                                Text("Minutes")
-                                    .font(.subheadline)
-                                Picker("Minutes", selection: $recipeMinutes) {
-                                    ForEach(0..<60, id: \.self) { minute in
-                                        Text("\(minute) min").tag(minute)
-                                    }
-                                }
-                                .pickerStyle(WheelPickerStyle())
-                                .frame(maxWidth: .infinity)
-                            }
-                        }
-                        .padding()
-
-                    }
-                    
-                }
-                VStack(alignment: .leading) {
-                    //MARK: - all images
-                    PhotosPicker(selection: $selectedImageItems, maxSelectionCount: 5, matching: .images) {
-                        Text("Add Images")
-                            .foregroundColor(.blue)
-                            .padding()
-                            .background(Color.pink.opacity(0.1))
-                            .cornerRadius(10)
-                    }
-                    .onChange(of: selectedImageItems) { newItems in
-                        loadSelectedImages()
-                    }
-                }
-                VStack(alignment: .leading) {
-                    
-                    Button(action: saveRecipe) {
-                        Text(isSaving ? "Saving..." : "Save Recipe")
+            NavigationView {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        
+                        TextField("Enter Recipe Name", text: $recipeName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
                             .font(settings.font)
                             .padding()
+                        
+                        TextField("Enter Recipe Description", text: $recipeDescription)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .font(settings.font)
+                            .padding()
+                        
+                        TextField("Add YouTube/Website URL", text: Binding(
+                            get: { videoURL ?? "" },
+                            set: { videoURL = $0.isEmpty ? nil : $0 }
+                        ))
+                        .textInputAutocapitalization(.none)
+                        .keyboardType(.URL)
+                        .padding()
+
+                            
+                        
+                        Text("Ingredients")
+                            .font(settings.font)
+                            .fontWeight(.bold)
+                        
+                        NavigationLink(destination: AddIngredientsView(ingredients: $ingredients)) {
+                            Text("Add Ingredient")
+                                .foregroundColor(.blue)
+                                .padding()
+                                .background(Color.pink.opacity(0.1))
+                                .cornerRadius(10)
+                        }
+                        
+                        ForEach(ingredients, id: \ .name) { ingredient in
+                            Text("\(ingredient.amount) \(ingredient.measurement) of \(ingredient.name) \(ingredient.section) ")
+                        }
+                        
+                        Text("Instructions")
+                            .font(settings.font)
+                            .fontWeight(.bold)
+                        
+                        NavigationLink(destination: AddInstructionsView(instructions: $instructions)) {
+                            Text("Add Instruction")
+                                .foregroundColor(.blue)
+                                .padding()
+                                .background(Color.pink.opacity(0.1))
+                                .cornerRadius(10)
+                        }
+                        
+                        ForEach(instructions, id: \ .stepNumber) { instruction in
+                            Text("Step \(instruction.stepNumber): \(instruction.instructionText)")
+                        }
+                        
+                        Text("Filters")
+                            .font(settings.font)
+                            .fontWeight(.bold)
+                        
+                        ForEach(allFilters, id: \ .self) { filter in
+                            HStack {
+                                Button(action: { toggleFilter(filter) }) {
+                                    Image(systemName: selectedFilters.contains(filter) ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(selectedFilters.contains(filter) ? .pink : .gray)
+                                }
+                                Text(filter)
+                                Spacer()
+                                Button(action: { deleteFilter(filter) }) {
+                                    Image(systemName: "trash").foregroundColor(.red)
+                                }
+                            }
+                        }
+                        
+                        TextField("Enter custom filter", text: $customFilterName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding()
+                        
+                        Button(action: addCustomFilter) {
+                            Text("Add")
+                                .padding()
+                                .background(Color.pink)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        
+                        Text("Cover Image")
+                            .font(settings.font)
+                            .fontWeight(.bold)
+                        
+                        if let coverImage {
+                            Image(uiImage: coverImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 200)
+                                .cornerRadius(10)
+                        }
+                        
+                        PhotosPicker(selection: $selectedImageItem, matching: .images) {
+                            Text("Choose Image")
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .onChange(of: selectedImageItem) { loadImage(from: $0) }
+                        
+                        Text("Time: \(recipeHours) hr \(recipeMinutes) min")
+                            .font(settings.font)
+                        
+                        HStack {
+                            Picker("Hours", selection: $recipeHours) {
+                                ForEach(0..<24) { Text("\($0) hr").tag($0) }
+                            }
+                            .pickerStyle(WheelPickerStyle())
                             .frame(maxWidth: .infinity)
-                            .background(Color.pink)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                            
+                            Picker("Minutes", selection: $recipeMinutes) {
+                                ForEach(0..<60) { Text("\($0) min").tag($0) }
+                            }
+                            .pickerStyle(WheelPickerStyle())
+                            .frame(maxWidth: .infinity)
+                        }
+                        
+                        PhotosPicker(selection: $selectedImageItems, maxSelectionCount: 5, matching: .images) {
+                            Text("Add Images")
+                                .foregroundColor(.blue)
+                                .padding()
+                                .background(Color.pink.opacity(0.1))
+                                .cornerRadius(10)
+                        }
+                        .onChange(of: selectedImageItems) { loadSelectedImages() }
+                        
+                        Button(action: saveRecipe) {
+                            Text(isSaving ? "Saving..." : "Save Recipe")
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.pink)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .disabled(isSaving || recipeName.isEmpty || recipeDescription.isEmpty || ingredients.isEmpty || instructions.isEmpty || (recipeHours == 0 && recipeMinutes == 0))
                     }
-                    .disabled(isSaving || recipeName.isEmpty || recipeDescription.isEmpty || ingredients.isEmpty || instructions.isEmpty || (recipeHours == 0 && recipeMinutes == 0))
-                    
-                    Spacer()
-                    
+                    .padding()
                 }
-            }
-            .navigationTitle("Create New Recipe")
-            .padding()
-            .onAppear {
-                loadFilters()
-                if let currentUser = DatabaseManager.shared.getCurrentUser() {
-                    self.currentUser = currentUser.username
+                .navigationTitle("Create New Recipe")
+                .onAppear {
+                        if let user = DatabaseManager.shared.getCurrentUser() {
+                            currentUser = user.username
+                            print("Current user: \(currentUser)")
+                        } else {
+                            print("No user logged in")
+                        }
+                    loadFilters()
                 }
+                .overlay(
+                            VStack {
+                                if showSuccessBanner {
+                                    Text(successMessage)
+                                        .font(settings.font)
+                                        .padding()
+                                        .background(Color.green)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                        .transition(.move(edge: .top))
+                                        .zIndex(1) // Ensure it stays on top
+                                }
+                                Spacer()
+                            }
+                        )
             }
         }
-    }
     
 //MARK: - Save recipe
     private func saveRecipe() {
+        // Prevent saving if already in progress
+        guard !isSaving else {
+            return
+        }
+
+        // Set saving state to true
+        isSaving = true
+        
+        // Validation checks
         guard !currentUser.isEmpty else {
             print("No user logged in")
+            isSaving = false
             return
         }
 
-        guard let time = Int(recipeTime), time > 0 else {
-            print("Invalid time input")
+        // Calculate the total time in minutes
+        let totalTimeInMinutes = (recipeHours * 60) + recipeMinutes
+        guard totalTimeInMinutes > 0 else {
+            print("Invalid time input: \(recipeHours) hours and \(recipeMinutes) minutes are not valid.")
+            isSaving = false
             return
         }
 
-        isSaving = true
+        guard !recipeName.isEmpty else {
+            print("Recipe name is empty")
+            isSaving = false
+            return
+        }
 
+        guard !recipeDescription.isEmpty else {
+            print("Recipe description is empty")
+            isSaving = false
+            return
+        }
+
+        guard !ingredients.isEmpty else {
+            print("Ingredients are missing")
+            isSaving = false
+            return
+        }
+
+        guard !instructions.isEmpty else {
+            print("Instructions are missing")
+            isSaving = false
+            return
+        }
+
+        guard !selectedFilters.isEmpty else {
+            print("No filters selected")
+            isSaving = false
+            return
+        }
+
+        guard coverImage != nil else {
+            print("Cover image is missing")
+            isSaving = false
+            return
+        }
+
+        if let videoURL = videoURL, !isValidURL(videoURL) {
+                print("Invalid video URL: \(videoURL)")
+                isSaving = false
+                return
+            }
+        
+        // If all validation passes, proceed with saving the recipe
         let success = RecipeDatabaseManager.shared.addRecipe(
             username: currentUser,
             name: recipeName,
             description: recipeDescription,
-            time: time,
+            time: totalTimeInMinutes, // Use computed minutes instead of recipeTime
             selectedFilters: Array(selectedFilters),
             ingredients: ingredients,
             instructions: instructions,
-            coverImagePath: coverImagePath,
+            coverImagePath: coverImagePath, // Ensure this is correctly stored
             otherImages: otherImages,
-            videoURL: videoURL.isEmpty ? nil : videoURL
-
+            videoURL: videoURL
         )
 
         if success {
             showSuccessBanner = true
             successMessage = "Recipe saved successfully!"
 
+            // Hide the success banner after 3 seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 showSuccessBanner = false
             }
 
-            recipeName = ""
-            recipeDescription = ""
-            selectedFilters.removeAll()
-            recipeTime = ""
-            ingredients.removeAll()
-            otherImages.removeAll()
+            resetFormFields()
         } else {
-            print("Failed to save recipe")
+            print("Failed to save the recipe. Please try again.")
         }
 
+        // Reset saving state
         isSaving = false
     }
+
+
+    private func isValidURL(_ url: String) -> Bool {
+        if let url = URL(string: url), UIApplication.shared.canOpenURL(url) {
+            return true
+        }
+        return false
+    }
+
+    private func resetFormFields() {
+        recipeName = ""
+        recipeDescription = ""
+        selectedFilters.removeAll()
+        recipeHours = 0
+        recipeMinutes = 0
+        ingredients.removeAll()
+        instructions.removeAll()
+        coverImagePath = nil
+        otherImages.removeAll()
+    }
+
+
 
 
 
@@ -439,7 +349,7 @@ struct CreateRecipePage: View {
                     newImagePaths.append(imagePath)
                 }
             }
-            otherImages.append(contentsOf: newImagePaths) // Now appending paths instead of UIImage
+            otherImages.append(contentsOf: newImagePaths)
         }
     }
 
@@ -448,24 +358,33 @@ struct CreateRecipePage: View {
         let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
 
         if let data = image.jpegData(compressionQuality: 0.8) {
-            try? data.write(to: path)
-            return path.path
+            do {
+                try data.write(to: path)
+                return path.path
+            } catch {
+                print("Error saving image to documents directory: \(error)")
+                return nil
+            }
         }
         return nil
     }
 
 
+
     private func loadImage(from item: PhotosPickerItem?) {
-            guard let item else { return }
-            Task {
-                if let data = try? await item.loadTransferable(type: Data.self), let uiImage = UIImage(data: data) {
-                    coverImage = uiImage
-                    coverImagePath = saveImageToDocuments(image: uiImage)
-                }
+        guard let item else { return }
+        Task {
+            if let data = try? await item.loadTransferable(type: Data.self), let uiImage = UIImage(data: data) {
+                coverImage = uiImage
+                coverImagePath = saveImageToDocuments(image: uiImage)
+            } else {
+                print("Failed to load image data")
             }
         }
+    }
 
-        // Save image to the app's documents folder
+
+
         private func saveImageToDocuments(image: UIImage) -> String? {
             let filename = UUID().uuidString + ".jpg"
             let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)

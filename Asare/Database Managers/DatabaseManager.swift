@@ -115,6 +115,7 @@ class DatabaseManager {
                 completion([])
             }
         }
+    
 
 
         func fetchAllUsers(completion: @escaping ([(username: String, email: String)]) -> Void) {
@@ -265,6 +266,7 @@ class DatabaseManager {
         }
         return nil
     }
+
 
 
     func logoutUser() {

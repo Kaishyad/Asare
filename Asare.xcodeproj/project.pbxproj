@@ -119,13 +119,13 @@
 		6328A1402D69E52D004DFA46 /* Database Managers */ = {
 			isa = PBXGroup;
 			children = (
-				63BCADC12D76384C00955814 /* InstructionsManager.swift */,
 				6328A13A2D68E041004DFA46 /* UsersListView.swift */,
 				6328A13C2D68E5CB004DFA46 /* UserSettingsManager.swift */,
 				6328A1362D68DA16004DFA46 /* DatabaseManager.swift */,
 				6328A13E2D69E476004DFA46 /* RecipeDatabaseManager.swift */,
 				638F41442D6F89410042B394 /* FilterManager.swift */,
 				638F41482D6F8A570042B394 /* ConnectionManager.swift */,
+				63BCADC12D76384C00955814 /* InstructionsManager.swift */,
 				63C491B52D74AE5800BB8108 /* IngredientManager.swift */,
 			);
 			path = "Database Managers";

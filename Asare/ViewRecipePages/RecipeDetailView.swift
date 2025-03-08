@@ -1,25 +1,56 @@
 import SwiftUI
 
 struct RecipeDetailView: View {
-    var recipe: (id: Int64, name: String, description: String, time: Int, filters: [String])
-    @Environment(\.presentationMode) var presentationMode
-    @State private var ingredients: [(name: String, amount: String, measurement: String)] = []
-    @State private var instructions: [(stepNumber: Int, instructionText: String)] = []
-
+    var recipe: (id: Int64, name: String, description: String, time: Int, filters: [String], videoURL: String?)
+    
+    @State private var coverImagePath: String?
+    @State private var otherImagePaths: [String] = []
+    @State private var showDeletionConfirmation: Bool = false
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                Text(recipe.name)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding(.top)
+                HStack {
+                    Text(recipe.name)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding(.top)
+                    
+                    Spacer()
+                    
+                    Button(action: deleteRecipe) {
+                        Image(systemName: "trash.fill")
+                            .foregroundColor(.red)
+                            .padding()
+                    }
+                }
 
                 Text(recipe.description)
                     .font(.body)
                     .foregroundColor(.gray)
                     .padding(.top)
 
-                // Display filters if any
+                Text(formatTime(minutes: recipe.time))
+                    .font(.subheadline)
+                    .foregroundColor(.pink)
+                    .padding(.top)
+
+                if let coverImagePath = coverImagePath, let coverImage = loadImage(fromPath: coverImagePath) {
+                    Image(uiImage: coverImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 200)
+                        .cornerRadius(10)
+                        .padding(.top)
+                }
+
+                if let videoURL = recipe.videoURL, !videoURL.isEmpty {
+                    Text("Video URL: \(videoURL)")
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                        .padding(.top)
+                }
+
                 if !recipe.filters.isEmpty {
                     Text("Filters: \(recipe.filters.joined(separator: ", "))")
                         .font(.subheadline)
@@ -27,87 +58,74 @@ struct RecipeDetailView: View {
                         .padding(.top)
                 }
 
-                // Display ingredients
-                if !ingredients.isEmpty {
-                    Text("Ingredients:")
-                        .font(.headline)
-                        .foregroundColor(.pink)
-                        .padding(.top)
-                    
-                    ForEach(ingredients, id: \.name) { ingredient in
-                        HStack {
-                            Text(ingredient.name)
-                                .font(.body)
-                            Spacer()
-                            Text(ingredient.measurement)
-                                .font(.body)
-                        }
-                        .padding(.vertical, 5)
+                ForEach(otherImagePaths, id: \.self) { imagePath in
+                    if let image = loadImage(fromPath: imagePath) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 150)
+                            .cornerRadius(10)
+                            .padding(.top)
                     }
-                } else {
-                    Text("No ingredients available")
-                        .font(.body)
-                        .foregroundColor(.gray)
-                        .padding(.top)
                 }
-
-                // Display instructions if available
-                if !instructions.isEmpty {
-                    Text("Instructions:")
-                        .font(.headline)
-                        .foregroundColor(.pink)
-                        .padding(.top)
-                    
-                    ForEach(instructions, id: \.stepNumber) { instruction in
-                        Text("Step \(instruction.stepNumber): \(instruction.instructionText)")
-                            .font(.body)
-                            .padding(.vertical, 5)
-                    }
-                } else {
-                    Text("No instructions available")
-                        .font(.body)
-                        .foregroundColor(.gray)
-                        .padding(.top)
-                }
-
-                Spacer()
             }
             .padding()
         }
         .navigationTitle(recipe.name)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    deleteRecipe()
-                }) {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
-                }
-            }
-        }
         .onAppear {
-            fetchIngredients()
-            fetchInstructions() // Fetch instructions when the view appears
+            if let coverImagePath = getCoverImage(forRecipeId: recipe.id) {
+                self.coverImagePath = coverImagePath
+            }
+            self.otherImagePaths = getOtherImages(forRecipeId: recipe.id)
+        }
+        .alert(isPresented: $showDeletionConfirmation) {
+            Alert(
+                title: Text("Delete Recipe"),
+                message: Text("Are you sure you want to delete this recipe?"),
+                primaryButton: .destructive(Text("Delete")) {
+                    if deleteRecipe(name: recipe.name) {
+                        print("Recipe deleted successfully")
+                    } else {
+                        print("Failed to delete recipe")
+                    }
+                },
+                secondaryButton: .cancel()
+            )
         }
     }
 
-    // Function to delete the recipe
-    private func deleteRecipe() {
-        let success = RecipeDatabaseManager.shared.deleteRecipe(name: recipe.name)
-        if success {
-            presentationMode.wrappedValue.dismiss() // Go back to RecipeView
+    private func formatTime(minutes: Int) -> String {
+        let hours = minutes / 60
+        let mins = minutes % 60
+        if hours > 0 {
+            return mins > 0 ? "\(hours) hr \(mins) min" : "\(hours) hr"
         } else {
-            print("Failed to delete recipe")
+            return "\(mins) min"
         }
     }
 
-    // Fetch ingredients for the recipe when the view appears
-    private func fetchIngredients() {
-        ingredients = IngredientManager.shared.fetchIngredientsForRecipe(recipeId: recipe.id)
+    private func loadImage(fromPath path: String) -> UIImage? {
+        if FileManager.default.fileExists(atPath: path) {
+            return UIImage(contentsOfFile: path)
+        } else {
+            print("Image not found at path: \(path)")
+            return nil
+        }
     }
 
-    // Fetch instructions for the recipe
-    private func fetchInstructions() {
-        instructions = InstructionsManager.shared.fetchInstructions(recipeId: recipe.id)
+    private func getCoverImage(forRecipeId recipeId: Int64) -> String? {
+        return RecipeDatabaseManager.shared.getCoverImage(forRecipeId: recipeId)
+    }
+
+    private func getOtherImages(forRecipeId recipeId: Int64) -> [String] {
+        return RecipeDatabaseManager.shared.getOtherImages(forRecipeId: recipeId)
+    }
+
+    private func deleteRecipe() {
+        showDeletionConfirmation = true
+    }
+
+    private func deleteRecipe(name: String) -> Bool {
+        return RecipeDatabaseManager.shared.deleteRecipe(name: name)
     }
 }

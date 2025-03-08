@@ -1,6 +1,5 @@
 import SwiftUI
 
-// Define Equatable conformance for the tuple (stepNumber, instructionText)
 extension AddInstructionsView {
     struct Instruction: Identifiable, Equatable {
         var id: Int { stepNumber }
@@ -14,12 +13,12 @@ extension AddInstructionsView {
 }
 
 struct AddInstructionsView: View {
-    @Binding var instructions: [(stepNumber: Int, instructionText: String)]  // Binding to update the instructions list
-    @State private var newInstruction: String = ""  // Text for adding new instructions
-    @State private var editingStepNumber: Int? = nil  // Track the step number being edited
-    @State private var editedInstructionText: String = ""  // Text for editing instructions
-    @State private var isPopoverPresented = false  // To control the presentation of the popover
-    @State private var selectedInstruction: Instruction? = nil  // The instruction to be edited
+    @Binding var instructions: [(stepNumber: Int, instructionText: String)]
+    @State private var newInstruction: String = ""
+    @State private var editingStepNumber: Int? = nil
+    @State private var editedInstructionText: String = ""
+    @State private var isPopoverPresented = false
+    @State private var selectedInstruction: Instruction? = nil
 
     var body: some View {
         VStack {
@@ -28,9 +27,8 @@ struct AddInstructionsView: View {
                 .fontWeight(.bold)
                 .padding()
 
-            // Input for new instructions using TextEditor
             TextEditor(text: $newInstruction)
-                .frame(height: 150) // Adjust the height to make the text box larger
+                .frame(height: 150)
                 .padding()
                 .background(Color.white)
                 .cornerRadius(10)
@@ -51,7 +49,6 @@ struct AddInstructionsView: View {
             .disabled(newInstruction.isEmpty)
             .padding()
 
-            // Display instructions in a grid layout (one block per row)
             if instructions.isEmpty {
                 Text("No instructions added yet.")
                     .font(.body)
@@ -78,9 +75,8 @@ struct AddInstructionsView: View {
                         .font(.title2)
                         .padding()
 
-                    // TextEditor for editing instruction text
                     TextEditor(text: $editedInstructionText)
-                        .frame(height: 150) // Adjust height for editing as well
+                        .frame(height: 150)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(10)
@@ -107,7 +103,6 @@ struct AddInstructionsView: View {
             }
         }
         .onChange(of: selectedInstruction) { _ in
-            // Ensure the popover is presented whenever the selectedInstruction changes
             isPopoverPresented = selectedInstruction != nil
         }
     }
@@ -116,26 +111,26 @@ struct AddInstructionsView: View {
         let newStepNumber = instructions.count + 1
         instructions.append((stepNumber: newStepNumber, instructionText: newInstruction))
         newInstruction = ""
-        updateStepNumbers()  // Update step numbers after adding
+        updateStepNumbers()
     }
 
     private func editInstruction(_ instruction: Instruction) {
         selectedInstruction = instruction
         editedInstructionText = instruction.instructionText
-        isPopoverPresented = true // Ensure the popover is shown when editing starts
+        isPopoverPresented = true
     }
 
     private func updateInstruction(stepNumber: Int) {
         if let index = instructions.firstIndex(where: { $0.stepNumber == stepNumber }) {
             instructions[index].instructionText = editedInstructionText
             resetEditingState()
-            updateStepNumbers()  // Reorder step numbers
+            updateStepNumbers()
         }
     }
 
     private func deleteInstruction(stepNumber: Int) {
         instructions.removeAll { $0.stepNumber == stepNumber }
-        updateStepNumbers()  // Reorder step numbers after deletion
+        updateStepNumbers()
     }
 
     private func updateStepNumbers() {
@@ -160,10 +155,10 @@ struct InstructionTile: View {
         VStack {
             Text("Step \(instruction.stepNumber)")
                 .font(.headline)
-                .foregroundColor(.black)  // Text color changed to black
+                .foregroundColor(.black)
             Text(instruction.instructionText)
                 .font(.body)
-                .foregroundColor(.black)  // Text color changed to black
+                .foregroundColor(.black)
                 .lineLimit(2)
                 .truncationMode(.tail)
                 .padding(.top, 5)
@@ -181,9 +176,9 @@ struct InstructionTile: View {
             }
         }
         .padding()
-        .background(Color.white)  // Changed the background to white
+        .background(Color.white)
         .cornerRadius(10)
-        .shadow(radius: 5)  // Added shadow for some depth
+        .shadow(radius: 5)
         .frame(height: 120)
     }
 }

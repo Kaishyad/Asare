@@ -153,10 +153,8 @@ struct ProfilePage: View {
         settings.isDarkMode = false
         settings.fontSize = 16
         settings.useDyslexiaFont = false
-        settings.measurementUnit = "Metric"
+        settings.measurementUnit = 0
     }
 }
 
-#Preview {
-    ProfilePage(isAuthenticated: .constant(true))
-}
+
