@@ -1,6 +1,7 @@
 import SwiftUI
 
 extension AddInstructionsView {
+    
     struct Instruction: Identifiable, Equatable {
         var id: Int { stepNumber }
         var stepNumber: Int
@@ -13,12 +14,15 @@ extension AddInstructionsView {
 }
 
 struct AddInstructionsView: View {
+    @EnvironmentObject var settings: AppSettings
+
     @Binding var instructions: [(stepNumber: Int, instructionText: String)]
     @State private var newInstruction: String = ""
     @State private var editingStepNumber: Int? = nil
     @State private var editedInstructionText: String = ""
     @State private var isPopoverPresented = false
     @State private var selectedInstruction: Instruction? = nil
+    @State private var showNewestFirst: Bool = false
 
     var body: some View {
         VStack {
@@ -26,11 +30,13 @@ struct AddInstructionsView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding()
+                .accessibilityAddTraits(.isHeader)
+
 
             TextEditor(text: $newInstruction)
                 .frame(height: 150)
                 .padding()
-                .background(Color.white)
+                .background(Color(uiColor: .systemBackground))
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -48,29 +54,57 @@ struct AddInstructionsView: View {
             }
             .disabled(newInstruction.isEmpty)
             .padding()
+            .accessibilityAddTraits(.isButton)
 
-            if instructions.isEmpty {
-                Text("No instructions added yet.")
-                    .font(.body)
-                    .foregroundColor(.gray)
-                    .padding()
-            } else {
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.flexible())], spacing: 20) {
-                        ForEach(instructions.map { Instruction(stepNumber: $0.stepNumber, instructionText: $0.instructionText) }, id: \.id) { instruction in
-                            InstructionTile(instruction: instruction, editAction: { editInstruction(instruction) }, deleteAction: { deleteInstruction(stepNumber: instruction.stepNumber) })
-                        }
-                    }
-                    .padding()
-                }
+
+            Toggle(isOn: $showNewestFirst) {
+                Text("Reverse Step Order")
+                    .font(.headline)
+                    .foregroundColor(.pink)
             }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color(uiColor: .systemBackground))
+            .cornerRadius(10)
+            .shadow(radius: 5)
+            .toggleStyle(SwitchToggleStyle(tint: .pink))
+            .accessibilityAddTraits(.isToggle)
+            .padding(.horizontal)
 
-            Spacer()
+
+                        if instructions.isEmpty {
+                            Text("No instructions added yet.")
+                                .font(.body)
+                                .foregroundColor(.gray)
+                                .padding()
+                        } else {
+                            ScrollView {
+                                LazyVGrid(columns: [GridItem(.flexible())], spacing: 20) {
+                                    ForEach((showNewestFirst ? instructions.reversed() : instructions).map { Instruction(stepNumber: $0.stepNumber, instructionText: $0.instructionText) }, id: \.id) { instruction in
+                                        InstructionTile(instruction: instruction, editAction: { editInstruction(instruction) }, deleteAction: { deleteInstruction(stepNumber: instruction.stepNumber) })
+                                    }
+                                }
+                                .padding()
+                            }
+                        }
+
+                        Spacer()
         }
         .padding()
         .popover(isPresented: $isPopoverPresented) {
             if let selectedInstruction = selectedInstruction {
                 VStack {
+                    HStack {
+                                    Spacer()
+                                    Button("Done") {
+                                        resetEditingState()
+                                    }
+                                    .padding()
+                                    .foregroundColor(.pink)
+                                    .accessibilityAddTraits(.isButton)
+
+                                }
+                    
                     Text("Edit Instruction")
                         .font(.title2)
                         .padding()
@@ -78,7 +112,7 @@ struct AddInstructionsView: View {
                     TextEditor(text: $editedInstructionText)
                         .frame(height: 150)
                         .padding()
-                        .background(Color.white)
+                        .background(Color(uiColor: .systemBackground))
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
@@ -98,6 +132,8 @@ struct AddInstructionsView: View {
                     }
                     .disabled(editedInstructionText.isEmpty)
                     .padding()
+                    .accessibilityAddTraits(.isButton)
+
                 }
                 .padding()
             }
@@ -105,6 +141,8 @@ struct AddInstructionsView: View {
         .onChange(of: selectedInstruction) { _ in
             isPopoverPresented = selectedInstruction != nil
         }
+        .background(Color(uiColor: .secondarySystemBackground))
+
     }
 
     private func addInstruction() {
@@ -155,10 +193,8 @@ struct InstructionTile: View {
         VStack {
             Text("Step \(instruction.stepNumber)")
                 .font(.headline)
-                .foregroundColor(.black)
             Text(instruction.instructionText)
                 .font(.body)
-                .foregroundColor(.black)
                 .lineLimit(2)
                 .truncationMode(.tail)
                 .padding(.top, 5)
@@ -176,7 +212,7 @@ struct InstructionTile: View {
             }
         }
         .padding()
-        .background(Color.white)
+        .background(Color(uiColor: .systemBackground))
         .cornerRadius(10)
         .shadow(radius: 5)
         .frame(height: 120)

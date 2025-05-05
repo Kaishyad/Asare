@@ -1,9 +1,3 @@
-//
-//  ConnectionManager.swift
-//  Asare
-//
-//  Created by Kaishya Desai on 26/02/2025.
-//
 
 import SQLite
 import Foundation
@@ -22,7 +16,7 @@ class ConnectionManager {
             print("Database path: \(path)")
 
             db = try Connection(path)
-            // You could move database table creation logic here if necessary, but it's better to keep it inside each manager
+            //better to keep connections it inside it's own manager
         } catch {
             print("Error initializing database connection: \(error)")
         }

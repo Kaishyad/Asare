@@ -31,9 +31,11 @@ class RecipeDatabaseManager {
     private let imageId = SQLite.Expression<Int64>("id")
     private let imagePath = SQLite.Expression<String>("image_path")
 
+    private let note = SQLite.Expression<String?>("note")
+
     private init() {
         db = ConnectionManager.shared.getConnection()
-        //dropTables()
+      // dropTables()
         createRecipesTable()
         createRecipeFiltersTable()
         createFavoritesTable()
@@ -45,12 +47,15 @@ class RecipeDatabaseManager {
             try db?.run("DROP TABLE IF EXISTS recipes")
             try db?.run("DROP TABLE IF EXISTS recipe_filters")
             try db?.run("DROP TABLE IF EXISTS favorites")
+            try db?.run("DROP TABLE IF EXISTS recipeImages")
 
             print("Tables dropped successfully!")
         } catch {
             print("Error dropping tables: \(error)")
         }
     }
+    
+    
     
     // MARK: - Tables
 
@@ -63,7 +68,8 @@ class RecipeDatabaseManager {
                 t.column(description)
                 t.column(time)
                 t.column(coverImage)
-                t.column(videoURL) 
+                t.column(videoURL)
+                t.column(note)
             })
             print("Recipes table created successfully!")
         } catch {
@@ -77,7 +83,7 @@ class RecipeDatabaseManager {
                 t.column(favoriteId, primaryKey: true)
                 t.column(favoriteUser)
                 t.column(favoriteRecipeId)
-                t.foreignKey(favoriteRecipeId, references: recipes, id) // Links to recipes table
+                t.foreignKey(favoriteRecipeId, references: recipes, id)
             })
             print("Favorites table created successfully!")
         } catch {
@@ -101,8 +107,8 @@ class RecipeDatabaseManager {
         do {
             try db?.run(recipeImages.create(ifNotExists: true) { t in
                 t.column(imageId, primaryKey: true)
-                t.column(recipeId, references: recipes, id) // Link to recipes table
-                t.column(imagePath) // Store image path
+                t.column(recipeId, references: recipes, id)
+                t.column(imagePath)
             })
             print("RecipeImages table created successfully!")
         } catch {
@@ -112,7 +118,7 @@ class RecipeDatabaseManager {
 
     // MARK: - Basic Recipe
 
-    func addRecipe(username: String, name: String, description: String, time: Int, selectedFilters: [String], ingredients: [(name: String, amount: String, measurement: String, section: String)], instructions: [(stepNumber: Int, instructionText: String)], coverImagePath: String?, otherImages: [String], videoURL: String?) -> Bool {
+    func addRecipe(username: String, name: String, description: String, time: Int, selectedFilters: [String], ingredients: [(name: String, amount: String, measurement: String, section: String)], instructions: [(stepNumber: Int, instructionText: String)], coverImagePath: String?, otherImages: [String], videoURL: String?, note: String?) -> Bool {
         do {
             guard let recipeId = try db?.run(recipes.insert(
                 self.username <- username,
@@ -120,7 +126,8 @@ class RecipeDatabaseManager {
                 self.description <- description,
                 self.time <- time,
                 self.coverImage <- coverImagePath,
-                self.videoURL <- videoURL // Store video URL
+                self.videoURL <- videoURL,
+                self.note <- note
             )) else {
                 print("Error: Failed to insert recipe.")
                 return false
@@ -148,10 +155,10 @@ class RecipeDatabaseManager {
 
 
 
-    func fetchRecipesForUser(username: String, completion: @escaping ([(id: Int64, name: String, description: String, time: Int, filters: [String], videoURL: String?)]) -> Void) {
+    func fetchRecipesForUser(username: String, completion: @escaping ([(id: Int64, name: String, description: String, time: Int, filters: [String], videoURL: String?, note: String?)]) -> Void) {
         do {
             let query = recipes.filter(self.username == username)
-            var fetchedRecipes: [(id: Int64, name: String, description: String, time: Int, filters: [String], videoURL: String?)] = []
+            var fetchedRecipes: [(id: Int64, name: String, description: String, time: Int, filters: [String], videoURL: String?, note: String?)] = []
 
             let allRecipes = try db?.prepare(query)
 
@@ -160,6 +167,7 @@ class RecipeDatabaseManager {
                 let recipeName = recipe[self.name]
                 let recipeDescription = recipe[self.description]
                 let recipeTime = recipe[self.time]
+                let recipeNote = recipe[self.note]
 
                 let filtersQuery = recipeFilters
                     .filter(self.recipeId == recipe[self.id])
@@ -174,7 +182,7 @@ class RecipeDatabaseManager {
 
                 let recipeVideoURL = recipe[self.videoURL]
 
-                fetchedRecipes.append((id: recipeId, name: recipeName, description: recipeDescription, time: recipeTime, filters: recipeFiltersList, videoURL: recipeVideoURL))
+                fetchedRecipes.append((id: recipeId, name: recipeName, description: recipeDescription, time: recipeTime, filters: recipeFiltersList, videoURL: recipeVideoURL, note:recipeNote))
             }
 
             completion(fetchedRecipes)
@@ -183,6 +191,53 @@ class RecipeDatabaseManager {
             completion([])
         }
     }
+    
+    func updateRecipeBasicDetails(id: Int64, name: String, description: String, videoURL: String?) -> Bool {
+        guard let db = ConnectionManager.shared.getConnection() else {
+            print("Database connection is nil")
+            return false
+        }
+        print("Updating recipe with ID \(id): name=\(name), description=\(description), videoURL=\(videoURL ?? "nil")")
+
+        let query = """
+            UPDATE recipes SET name = ?, description = ?, video_url = ? WHERE id = ?
+        """
+
+        do {
+            try db.run(query, name, description, videoURL, id)
+            return true
+        } catch {
+            print("Update failed: \(error)")
+            return false
+        }
+    }
+
+    // MARK: - Fetch Recipe Notes
+
+        func fetchRecipeNote(recipeId: Int64) -> String? {
+            do {
+                let query = recipes.filter(id == recipeId)
+                if let recipe = try db?.pluck(query) {
+                    return recipe[note] // Fetch the note
+                }
+            } catch {
+                print("Error fetching note for recipe: \(error)")
+            }
+            return nil
+        }
+    func updateRecipeNote(recipeId: Int64, note: String) {
+        do {
+            let recipeToUpdate = recipes.filter(id == recipeId)
+            try db?.run(recipeToUpdate.update(self.note <- note))
+            print("Recipe note updated for recipe ID \(recipeId)")
+        } catch {
+            print("Error updating recipe note: \(error)")
+        }
+    }
+
+
+    
+    // MARK: - Images
 
     func getCoverImage(forRecipeId recipeId: Int64) -> String? {
             do {
@@ -196,18 +251,21 @@ class RecipeDatabaseManager {
             return nil
         }
 
-        func getOtherImages(forRecipeId recipeId: Int64) -> [String] {
-            var images: [String] = []
-            do {
-                let query = recipeImages.filter(self.recipeId == recipeId)
-                for row in try db!.prepare(query) {
-                    images.append(row[self.imagePath]) 
-                }
-            } catch {
-                print("Error fetching other images for recipe: \(error)")
+    func getOtherImages(forRecipeId recipeId: Int64) -> [String] {
+        var images: [String] = []
+        do {
+            let query = recipeImages.filter(self.recipeId == recipeId)
+            for row in try db!.prepare(query) {
+                let path = row[self.imagePath]
+                images.append(path)
             }
-            return images
+        } catch {
+            print("Failed to fetch other images: \(error)")
         }
+        return images
+    }
+
+
     
     func fetchOtherImages(recipeId: Int64) -> [String] {
         var images: [String] = []
@@ -280,6 +338,7 @@ class RecipeDatabaseManager {
         }
     }
 
+    //MARK: - More Recipe Functions
     func getRecipeIdByName(_ name: String) -> Int64? {
         do {
             let query = recipes.filter(self.name == name)
@@ -291,7 +350,43 @@ class RecipeDatabaseManager {
         }
         return nil
     }
+    func clearDatabase() {
+        do {
+            try db?.run(recipes.delete())
+            try db?.run(recipeFilters.delete())
+            try db?.run(favorites.delete())
+            try db?.run(recipeImages.delete())
+            print("Database cleared successfully!")
+        } catch {
+            print("Error clearing database: \(error)")
+        }
+    }
     
-    
+    func updateRecipeFilters(recipeId: Int64, filters: [String]) {
+        do {
+            let deleteQuery = recipeFilters.filter(self.recipeId == recipeId)
+            try db?.run(deleteQuery.delete())
+
+            for filter in filters {
+                if let filterIdValue = FilterManager.shared.getFilterIdByName(filter) {
+                    try db?.run(recipeFilters.insert(self.recipeId <- recipeId, self.filterIdRef <- filterIdValue))
+                }
+            }
+
+            print("Updated filters for recipe \(recipeId)")
+        } catch {
+            print("Error updating recipe filters: \(error)")
+        }
+    }
+    func updateRecipeTime(recipeId: Int64, time: Int) {
+        do {
+            let recipeToUpdate = recipes.filter(id == recipeId)
+            try db?.run(recipeToUpdate.update(self.time <- time))
+            print("Updated time for recipe \(recipeId) to \(time) minutes.")
+        } catch {
+            print("Error updating recipe time: \(error)")
+        }
+    }
+
     
 }
