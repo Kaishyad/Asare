@@ -12,9 +12,9 @@ class FilterManager {
     private let defaultFilters = ["Vegetarian", "Quick", "Spicy", "High-Protein", "Gluten-Free", "Vegan", "Dairy-Free", "Keto"]
 
     private init() {
-        db = ConnectionManager.shared.getConnection() // Get connection from ConnectionManager
-      //  dropFiltersTable()  // Delete the filters table
-        createFiltersTable() // Recreate the filters table
+        db = ConnectionManager.shared.getConnection()
+      //  dropFiltersTable()
+        createFiltersTable()
     }
     private func dropFiltersTable() {
         do {
@@ -59,7 +59,7 @@ class FilterManager {
         return nil
     }
 
-    // Provide access to the filter expressions for join operations
+    //MARK: - Give access to the filters
     func getFiltersTable() -> Table {
         return filters
     }

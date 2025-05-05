@@ -1,13 +1,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var settings = AppSettings() //create AppSettings as a StateObject
-    @State private var isAuthenticated: Bool = DatabaseManager.shared.isUserAuthenticated() //Get auth status from SQLite
+    @StateObject var settings = AppSettings()
+    @State private var isAuthenticated: Bool = DatabaseManager.shared.isUserAuthenticated()
     @State private var showBanner: Bool = false
+    @State private var didInitialLoad = false
 
     private let settingsManager = UserSettingsManager.shared
 
-    func loadUserSettings() {
+    func loadUserSettings() { //load in some app settings for the user to use at start
+        guard !didInitialLoad else { return }
+        didInitialLoad = true
+        
         if let user = DatabaseManager.shared.getCurrentUser(),
            let userSettings = settingsManager.getUserSettings(username: user.username) {
             settings.isDarkMode = userSettings.darkMode
@@ -21,6 +25,7 @@ struct ContentView: View {
         NavigationStack {
             if isAuthenticated {
                 TabView {
+                    //Code Adapted from Indently, 2021 for the bottom nav bar
                     NavigationStack {
                         HomePage()
                             .environmentObject(settings)
@@ -64,7 +69,8 @@ struct ContentView: View {
                     .tabItem {
                         Image(systemName: "book.fill")
                         Text("Recipes")
-                    }
+                    }                                        .accessibilityAddTraits(.isButton)
+
 
                     // Create Recipe Tab
                     NavigationStack {
@@ -74,7 +80,8 @@ struct ContentView: View {
                     .tabItem {
                         Image(systemName: "plus.circle.fill")
                         Text("Create")
-                    }
+                    }                                        .accessibilityAddTraits(.isButton)
+
                     // Settings Tab
                     NavigationStack {
                         SettingsPage()
@@ -83,7 +90,8 @@ struct ContentView: View {
                     .tabItem {
                         Image(systemName: "gearshape.fill")
                         Text("Settings")
-                    }
+                    }                                        .accessibilityAddTraits(.isButton)
+
 
                     // Profile Tab
                     NavigationStack {
@@ -93,29 +101,16 @@ struct ContentView: View {
                     .tabItem {
                         Image(systemName: "person.fill")
                         Text("Profile")
-                    }
-                    
-//                    // View All Square Recipes Tab
-//                    NavigationStack {SquareRecipe()
-//                            .environmentObject(settings)
-//                    }
-//                    .tabItem {
-//                        Image(systemName: "book.fill")
-//                        Text("Square Recipes")
-//                    }
-//                    // View All Recipes Tab
-//                    NavigationStack {
-//                        ViewRecipesPage()
-//                            .environmentObject(settings)
-//                    }
-//                    .tabItem {
-//                        Image(systemName: "book.fill")
-//                        Text("List Recipes")
-//                    }
+                    }                                        .accessibilityAddTraits(.isButton)
+
+
+                    //End of Adaption
+
                    
                 }.accentColor(.pink)
                 .preferredColorScheme(settings.isDarkMode ? .dark : .light)
                 .onAppear {
+                    
                     loadUserSettings() //Load settings when ContentView appears
                 }
             } else {
@@ -123,7 +118,6 @@ struct ContentView: View {
                 LoginPage(isAuthenticated: $isAuthenticated)
                     .environmentObject(settings)
                     .onDisappear {
-                        //Ensure the `isAuthenticated` is reset to false when leaving the login screen
                         isAuthenticated = DatabaseManager.shared.isUserAuthenticated()
                     }
             }

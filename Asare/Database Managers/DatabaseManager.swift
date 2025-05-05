@@ -13,10 +13,7 @@ class DatabaseManager {
         private let email = SQLite.Expression<String>("email")
         private let password = SQLite.Expression<String>("password")
         private let isLoggedIn = SQLite.Expression<Bool>("isLoggedIn")
-        private let recipeName = SQLite.Expression<String>("name")
-        private let recipeDescription = SQLite.Expression<String>("description")
-        private let recipeFilters = SQLite.Expression<String>("filters")
-        private let recipeUsername = SQLite.Expression<String>("recipeUsername")
+     
 
     private init() {
         do {
@@ -28,19 +25,17 @@ class DatabaseManager {
             print("Database path: \(path)")
 
             db = try Connection(path)
+          //  dropUsersTable()
             createUsersTable()
-            createRecipesTable()
         } catch {
             print("Error initializing database: \(error)")
         }
     }
     private func createUsersTable() {
         do {
-            // Ensure the table exists before interacting with it
             let exists = try db?.scalar("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users'") as? Int64 ?? 0
 
             if exists == 0 {
-                // Table doesn't exist, so create it
                 try db?.run(users.create { t in
                     t.column(id, primaryKey: true)
                     t.column(username, unique: true)
@@ -56,65 +51,15 @@ class DatabaseManager {
             print("Error creating users table: \(error)")
         }
     }
-    // MARK: - Recipe Functions
-    private func createRecipesTable() {
-            do {
-                // Ensure the table exists before interacting with it
-                let exists = try db?.scalar("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='recipes'") as? Int64 ?? 0
-
-                if exists == 0 {
-                    // Table doesn't exist, so create it
-                    try db?.run(recipes.create { t in
-                        t.column(id, primaryKey: true)
-                        t.column(recipeName)
-                        t.column(recipeDescription)
-                        t.column(recipeFilters)
-                        t.column(recipeUsername) // Add column for username
-                    })
-                    print("Recipes table created!")
-                } else {
-                    print("Recipes table already exists!")
-                }
-            } catch {
-                print("Error creating recipes table: \(error)")
-            }
+    private func dropUsersTable() {
+        do {
+            try db?.run("DROP TABLE IF EXISTS users")
+            print("Filters table dropped successfully!")
+        } catch {
+            print("Error dropping filters table: \(error)")
         }
-
-        func addRecipe(username: String, name: String, description: String, selectedFilters: [String]) -> Bool {
-            let filters = selectedFilters.joined(separator: ", ")
-            
-            do {
-                // Insert recipe with associated username
-                try db?.run(recipes.insert(recipeName <- name, recipeDescription <- description, recipeFilters <- filters, recipeUsername <- username))
-                print("Recipe added successfully!")
-                return true
-            } catch {
-                print("Error adding recipe: \(error)")
-                return false
-            }
-        }
-
-        func fetchUserRecipes(username: String, completion: @escaping ([(name: String, description: String, filters: String)]) -> Void) {
-            do {
-                let query = recipes.filter(recipeUsername == username) // Fetch only user's recipes
-                var recipesList: [(name: String, description: String, filters: String)] = []
-
-                let rows = try db?.prepare(query)
-
-                for row in rows ?? AnySequence([]) {
-                    recipesList.append(
-                        (name: row[recipeName],
-                         description: row[recipeDescription],
-                         filters: row[recipeFilters])
-                    )
-                }
-
-                completion(recipesList)
-            } catch {
-                print("Error fetching user recipes: \(error)")
-                completion([])
-            }
-        }
+    }
+    
     
 
 
@@ -174,7 +119,7 @@ class DatabaseManager {
         let usernameColumn = SQLite.Expression<String>("username")
         let passwordColumn = SQLite.Expression<String>("password")
         
-        let hashedNewPassword = hashPassword(newPassword) // Secure the password
+        let hashedNewPassword = hashPassword(newPassword)
 
         do {
             let userToUpdate = users.filter(usernameColumn == username)
@@ -259,14 +204,16 @@ class DatabaseManager {
         do {
             let query = users.filter(isLoggedIn == true)
             if let user = try db?.pluck(query) {
+                //print("Current logged-in user: \(user[username])")  // Debug output
                 return (username: user[username], email: user[email])
+            } else {
+                print("No user found with isLoggedIn = true")  // Debug output
             }
         } catch {
             print("Error fetching current user: \(error)")
         }
-        return nil
+        return nil // Return nil if no user is logged in
     }
-
 
 
     func logoutUser() {
@@ -276,13 +223,20 @@ class DatabaseManager {
         }
 
         do {
-            let user = users.filter(self.username == currentUser.username)
-            try db?.run(user.update(isLoggedIn <- false))
-            print("User logged out successfully!")
+            let userToUpdate = users.filter(self.username == currentUser.username)
+            let rowsAffected = try db?.run(userToUpdate.update(isLoggedIn <- false)) ?? 0
+            
+            if rowsAffected > 0 {
+                print("User \(currentUser.username) logged out successfully!")
+            } else {
+                print("No rows affected during logout. User may not have been logged in.")
+            }
         } catch {
             print("Error during logout: \(error)")
         }
     }
+
+
 
 
     func testInsertUser() {
@@ -295,6 +249,29 @@ class DatabaseManager {
     }
 
     
+    func updateUsername(currentUsername: String, newUsername: String) -> Bool {
+        let userToUpdate = users.filter(username == currentUsername)
+        do {
+            try db?.run(userToUpdate.update(username <- newUsername))
+            print("Username updated successfully!")
+            return true
+        } catch {
+            print("Error updating username: \(error)")
+            return false
+        }
+    }
+
+    func updateEmail(currentUsername: String, newEmail: String) -> Bool {
+        let userToUpdate = users.filter(username == currentUsername)
+        do {
+            try db?.run(userToUpdate.update(email <- newEmail))
+            print("Email updated successfully!")
+            return true
+        } catch {
+            print("Error updating email: \(error)")
+            return false
+        }
+    }
 
 
     func isUserAuthenticated() -> Bool {

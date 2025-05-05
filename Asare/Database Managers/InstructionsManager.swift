@@ -13,7 +13,7 @@ class InstructionsManager {
 
     private init() {
         db = ConnectionManager.shared.getConnection()
-        //dropInstructionsTable()
+      //  dropInstructionsTable()
         createInstructionsTable()
     }
 
@@ -39,19 +39,46 @@ class InstructionsManager {
     }
     func addInstructions(recipeId: Int64, instructionsList: [(stepNumber: Int, instructionText: String)]) {
         do {
-            var stepCounter = instructionsList.count + 1
+            //Resets by deleting all existing instructions for the recipe
+            try db?.run(instructions.filter(self.recipeId == recipeId).delete())
+            
+            var stepCounter = 1
             
             for instruction in instructionsList {
-                try db?.run(instructions.insert(self.recipeId <- recipeId, self.stepNumber <- stepCounter, self.instructionText <- instruction.instructionText))
+                try db?.run(instructions.insert(
+                    self.recipeId <- recipeId,
+                    self.stepNumber <- stepCounter,
+                    self.instructionText <- instruction.instructionText
+                ))
                 stepCounter += 1
             }
+
             print("Instructions added successfully!")
         } catch {
             print("Error adding instructions: \(error)")
         }
     }
+    private func stepExists(recipeId: Int64, stepNumber: Int) -> Bool {
+        do {
+            let count = try db?.scalar(
+                instructions
+                    .filter(self.recipeId == recipeId && self.stepNumber == stepNumber)
+                    .count
+            ) ?? 0
+            return count > 0
+        } catch {
+            print("Error checking if step exists: \(error)")
+            return false
+        }
+    }
+
 
     func deleteInstruction(recipeId: Int64, stepNumber: Int) {
+        guard stepExists(recipeId: recipeId, stepNumber: stepNumber) else {
+            print("Step number \(stepNumber) does not exist for recipe \(recipeId)")
+            return
+        }
+
         do {
             let query = instructions.filter(self.recipeId == recipeId && self.stepNumber == stepNumber)
             try db?.run(query.delete())
@@ -60,6 +87,7 @@ class InstructionsManager {
             print("Error deleting instruction: \(error)")
         }
     }
+
 
     func fetchInstructions(recipeId: Int64) -> [(stepNumber: Int, instructionText: String)] {
         var instructionList: [(stepNumber: Int, instructionText: String)] = []
@@ -77,7 +105,7 @@ class InstructionsManager {
     func updateStepNumbers(recipeId: Int64) {
         let instructionsList = fetchInstructions(recipeId: recipeId)
         do {
-            try db?.run(instructions.filter(self.recipeId == recipeId).delete()) // Remove existing instructions for this recipe
+            try db?.run(instructions.filter(self.recipeId == recipeId).delete())
             var stepCounter = 1
             for instruction in instructionsList {
                 try db?.run(instructions.insert(self.recipeId <- recipeId, self.stepNumber <- stepCounter, self.instructionText <- instruction.instructionText))
@@ -87,4 +115,20 @@ class InstructionsManager {
             print("Error updating step numbers: \(error)")
         }
     }
+    func updateInstruction(recipeId: Int64, stepNumber: Int, newText: String) {
+        //for the editing
+        guard stepExists(recipeId: recipeId, stepNumber: stepNumber) else {
+            print("Cannot update: step number \(stepNumber) does not exist.")
+            return
+        }
+
+        do {
+            let query = instructions.filter(self.recipeId == recipeId && self.stepNumber == stepNumber)
+            try db?.run(query.update(self.instructionText <- newText))
+            print("Instruction updated successfully.")
+        } catch {
+            print("Error updating instruction: \(error)")
+        }
+    }
+    
 }

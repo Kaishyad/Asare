@@ -2,96 +2,147 @@ import SwiftUI
 
 struct SettingsPage: View {
     @EnvironmentObject var settings: AppSettings
+    
     @State private var currentUser: (username: String, email: String)?
+    @State private var hasLoadedUser = false
+    @State private var hasLoadedUserSettings = false
+    @State private var localDarkMode = false
+    @State private var localFontSize = 20.0
+    @State private var localUseDyslexiaFont = false
+    @State private var localMeasurementUnit = 0
+    @State private var localIsGridView = false
+    
     @State private var isSaving = false
-
+    @State private var hasLoaded = false
     private let settingsManager = UserSettingsManager.shared
-
-    func loadUserSettings() {
+    private func loadUserSettings() {
+        guard !hasLoaded else { return }
+        hasLoaded = true
         if let user = DatabaseManager.shared.getCurrentUser() {
             currentUser = user
             if let userSettings = settingsManager.getUserSettings(username: user.username) {
-                settings.isDarkMode = userSettings.darkMode
-                settings.fontSize = userSettings.fontSize
-                settings.useDyslexiaFont = userSettings.useDyslexiaFont
-                settings.measurementUnit = userSettings.measurementUnit
-                settings.isGridView = userSettings.isGridView // Load Grid/List preference
+                localDarkMode = userSettings.darkMode
+                localFontSize = userSettings.fontSize
+                localUseDyslexiaFont = userSettings.useDyslexiaFont
+                localMeasurementUnit = userSettings.measurementUnit
+                localIsGridView = userSettings.isGridView
             }
         }
     }
-
-    func saveUserSettings() {
-        guard let username = currentUser?.username else { return }
-        
+    private func saveUserSettings() {
+        guard !isSaving, let username = currentUser?.username else { return }
         isSaving = true
         
+        let darkMode = localDarkMode
+        let fontSize = localFontSize
+        let useDyslexiaFont = localUseDyslexiaFont
+        let measurementUnit = localMeasurementUnit
+        let isGridView = localIsGridView
         DispatchQueue.global(qos: .background).async {
             settingsManager.saveUserSettings(
                 username: username,
-                darkMode: settings.isDarkMode,
-                fontSize: settings.fontSize,
-                useDyslexiaFont: settings.useDyslexiaFont,
-                measurementUnit: settings.measurementUnit,
-                isGridView: settings.isGridView
+                darkMode: darkMode,
+                fontSize: fontSize,
+                useDyslexiaFont: useDyslexiaFont,
+                measurementUnit: measurementUnit,
+                isGridView: isGridView
             )
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            DispatchQueue.main.async {
+                settings.isDarkMode = darkMode
+                settings.fontSize = fontSize
+                settings.useDyslexiaFont = useDyslexiaFont
+                settings.measurementUnit = measurementUnit
                 isSaving = false
             }
         }
     }
-
     var body: some View {
-        Form {
-            Section(header: Text("Appearance").font(settings.font)) {
-                Toggle("Dark Mode", isOn: $settings.isDarkMode)
-                    .font(settings.font)
-                    .tint(.pink)
-                    .accessibilityLabel("Toggle Dark Mode")
-            }
-
-            Section(header: Text("Font & Accessibility").font(settings.font)) {
-                Slider(value: $settings.fontSize, in: 12...30, step: 1)
-                    .accessibilityValue("\(Int(settings.fontSize)) points")
-                Text("Preview: \(Int(settings.fontSize)) pt")
-                    .font(settings.font)
-
-                Toggle("Use Dyslexia-Friendly Font", isOn: $settings.useDyslexiaFont)
-                    .font(settings.font)
-                    .tint(.pink)
-                    .accessibilityLabel("Enable Dyslexia-Friendly Font")
-            }
-
-            Section(header: Text("Preferences").font(settings.font)) {
-                Picker("Measurement Unit", selection: $settings.measurementUnit) {
-                    Text("Metric (kg, ml)").tag(0)
-                    Text("Imperial (lbs, oz)").tag(1)
+        NavigationView {
+        VStack(alignment: .leading) {
+            Text("Settings")
+                .font(settings.largeTitleFont)
+                .foregroundColor(.pink)
+                .padding()
+            //Code adapted from Sharma, 2022
+            Form {
+                Section(header: Text("Appearance").font(.system(size: localFontSize))) {
+                    Toggle("Dark Mode", isOn: $localDarkMode)
+                        .font(localUseDyslexiaFont
+                            ? .custom("Dyslexie Regular", size: localFontSize)
+                            : .system(size: localFontSize))
+                        .tint(.pink)
+                        .accessibilityLabel("Toggle Dark Mode")
+                                                    .accessibilityAddTraits(.isButton)
                 }
-                .pickerStyle(SegmentedPickerStyle())
-                .font(settings.font)
-                .accessibilityLabel("Measurement Unit Selection")
-
-                Toggle("Use Grid View", isOn: $settings.isGridView)
-                    .font(settings.font)
-                    .tint(.pink)
-                    .accessibilityLabel("Toggle Grid/List View")
-            }
-
-            Section {
-                Button(action: saveUserSettings) {
-                    HStack {
-                        if isSaving {
-                            ProgressView()
-                        } else {
-                            Text("Save Settings")
-                                .font(settings.font)
-                        }
+                Section(header: Text("Font & Accessibility").font(.system(size: localFontSize))) {
+                    Slider(value: $localFontSize, in: 12...30, step: 1)
+                        .accessibilityLabel("Font Size Slider")
+                        .accessibilityValue("\(Int(localFontSize)) points")
+                    Text("Preview: \(Int(localFontSize)) pt")
+                        .font(localUseDyslexiaFont
+                            ? .custom("Dyslexie Regular", size: localFontSize)
+                            : .system(size: localFontSize))
+                    Toggle("Use Dyslexia-Friendly Font", isOn: $localUseDyslexiaFont)
+                        .font(localUseDyslexiaFont
+                            ? .custom("Dyslexie Regular", size: localFontSize)
+                            : .system(size: localFontSize))
+                        .tint(.pink)
+                        .accessibilityLabel("Toggle Dyslexia-Friendly Font")
+                        .accessibilityAddTraits(.isButton)
+                }
+                Section(header: Text("Preferences").font(.system(size: localFontSize))) {
+                    Picker("Measurement Unit", selection: $localMeasurementUnit) {
+                        Text("Metric (kg, ml)").tag(0)
+                            .font(localUseDyslexiaFont
+                                ? .custom("Dyslexie Regular", size: localFontSize)
+                                : .system(size: localFontSize))
+                        Text("Imperial (lbs, oz)").tag(1)
+                            .font(localUseDyslexiaFont
+                                ? .custom("Dyslexie Regular", size: localFontSize)
+                                : .system(size: localFontSize))
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .accessibilityLabel("Measurement Unit Picker")
+                   // Spacer()
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Toggle("Use Grid View", isOn: $localIsGridView)
+                            .font(localUseDyslexiaFont
+                                ? .custom("Dyslexie Regular", size: localFontSize)
+                                : .system(size: localFontSize))
+                            .tint(.pink)
+                        Text("Choose grid or list layout for the recipe page")
+                            //.font(.system(size: 10))
+                            .font(localUseDyslexiaFont
+                                ? .custom("Dyslexie Regular", size: localFontSize)
+                                : .system(size: localFontSize - 7))
                     }
                 }
-                .disabled(isSaving) 
+                Section {
+                    Button(action: saveUserSettings) {
+                        HStack {
+                            if isSaving {
+                                ProgressView()
+                                
+                            } else {
+                                Text("Save Settings")
+                                    .font(.system(size: localFontSize))
+                            }
+                        }
+                    }
+                    .disabled(isSaving)
+                    .accessibilityLabel("Save Settings Button")
+                    .accessibilityAddTraits(.isButton)
+                }
+            }//End of Adaption
+        }
+      //  .navigationTitle("Settings")
+        .task {
+            if !hasLoadedUserSettings {
+                hasLoadedUserSettings = true
+                loadUserSettings()
             }
         }
-        .navigationTitle("Settings")
-        .onAppear(perform: loadUserSettings)
+        }
     }
 }
