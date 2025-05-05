@@ -1,4 +1,4 @@
-![Āsare Logo](https://i.imgur.com/yoyxoK2.png)
+![Āsare Logo](https://i.imgur.com/Zqtsada.png)
 
 # Āsare 
 Āsare (આસરે), derived from the Gujarati word meaning "by estimation," is a unique recipe app designed to embrace the informal and intuitive way many cultures cook: without strict measurements or rigid instructions.
